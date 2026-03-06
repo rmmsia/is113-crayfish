@@ -6,7 +6,7 @@ router.get('/register', (req , res) => {
 })
 
 router.get('/login', (req, res) => {
-  res.send('login')
+  res.render('auth/login')
 })
 
 module.exports = router;
