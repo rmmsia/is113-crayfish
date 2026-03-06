@@ -4,6 +4,8 @@ const server = express();
 const port = 3000;
 const path = require("path");
 
+const authRoutes = require('./routes/auth')
+
 server.set("view engine", "ejs")
 
 server.use("/", express.static(path.join(__dirname, "public")));
@@ -41,6 +43,7 @@ let posts = [
   }
 ];
 
+server.use('/', authRoutes);
 
 // Route to home page sorted by top posts by default
 server.get('/home', (req, res) => {

@@ -1,3 +1,7 @@
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
 .header {
   display: flex;
   align-items: center;
@@ -38,17 +42,6 @@
   gap: 1.5rem;
   font-size: 0.75rem;
   letter-spacing: 0.1em;
-}
-
-.btn-submit {
-  padding: 0.35rem 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  border-radius: 2em;
-}
-
-.btn-submit:hover {
-  background: yellow;
 }
 
 .post-list {
@@ -145,3 +138,44 @@
 .author { color: #9dae00; }
 
 .comments-link { color: #414040; }
+
+.register-page {
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.register-form {
+  margin-top: 1rem;
+}
+
+.register-form .form-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.8rem;
+}
+
+.register-form .form-row label {
+  width: 160px;
+  text-align: left;
+}
+
+.register-form .form-row input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem;
+  max-width: 300px;
+}
+
+.register-form h2 {
+  margin: 1.5rem 0 1rem;
+}
+
+.register-form .form-actions {
+  margin-top: 1rem;
+  padding-left: calc(160px + 0.75rem);
+}
+
+.register-form .form-actions .btn-submit {
+  padding: 0.5rem;
+}
