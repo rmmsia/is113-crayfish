@@ -1,0 +1,24 @@
+{
+  "name": "is113-crayfish",
+  "version": "1.0.0",
+  "description": "Lobste.rs-like message board",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rmmsia/is113-crayfish.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/rmmsia/is113-crayfish/issues"
+  },
+  "homepage": "https://github.com/rmmsia/is113-crayfish#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
