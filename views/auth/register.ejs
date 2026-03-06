@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Crayfish - Register</title>
+  </head>
+  <body>
+    <%- include('../header') %>
+    <main class="register-page">
+      <h1>Register</h1>
+      <form class="register-form" action="/register" method="post">
+        <div class="form-row">
+          <label for="username">Username: </label>
+          <input type="text" name="username" id="username" />
+        </div>
+        <div class="form-row">
+          <label for="email">Email: </label>
+          <input type="email" name="email" id="email" />
+        </div>
+        <div class="form-row">
+          <label for="password">Password: </label>
+          <input type="password" name="password" id="password" />
+        </div>
+
+        <h2>Verification</h2>
+
+        <div class="form-row">
+          <label for="invite">Inviting User: </label>
+          <input type="text" name="invite" id="invite" />
+        </div>
+
+        <div class="form-row">
+          <label for="vcode">Verification Code: </label>
+          <input type="text" name="vcode" id="vcode" />
+        </div>
+
+        <div class="form-actions">
+          <input class="btn-submit" type="submit" value="Register" />
+        </div>
+      </form>
+    </main>
+  </body>
+</html>

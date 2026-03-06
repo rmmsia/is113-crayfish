@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Crayfish: Home</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+    <%- include('header') %>
+    <nav class="site-nav">
+        <a href="/home?sort=top">TOP</a>    <%# TBD: If got time, create sorted views using GET requests, default as top %>
+        <a href="/home?sort=new">NEW</a>    <%# TBD: If got time, create sorted views using GET requests %>
+        <a href="/create-post" class="btn-submit">+ CREATE POST</a> <%# TBD: Create "Create Post" page/popup box using /create-post process %>
+    </nav>
+    <ol class="post-list">
+        <% posts.forEach((post, i) => { %>
+            <li class="post-card" data-id="<%= post.id %>">
+                <div class="rank">#<%= i + 1 %></div>   <%# Ranking if sorting is implemented %>
+
+                <div class="voting-col">
+                    <button class="up vote-btn" data-id="<%= post.id %>" data-dir="up" title="upvote">▲</button>
+                    <span class="score" data-id="<%= post.id %>"><%= post.upvotes - post.downvotes %></span>
+                    <button class="down vote-btn" data-id="<%= post.id %>" data-dir="down" title="downvote">▼</button>
+                </div>
+
+                <a href="/post/<%= post.id %>" class="post-thumbnail-link"> <%# TBD: need to create expanded post page %>
+                    <img class="post-thumbnail" src="<%= post.imageURL %>" alt="<%= post.title %>" loading="lazy" />
+                </a>
+
+                <div class="post-body">
+                    <a href="/post/<%= post.id %>" class="post-title"><%= post.title %></a>
+                    <div class="post-sub">
+                        <span class="author">@<%= post.author %></span>
+                        <span class="dot">·</span>
+                        <span class="time"><%= post.datetime %></span>  <%# TBD: need to reconvert time back to readable format %>
+                        <span class="dot">·</span>
+                        <a href="/post/<%= post.id %>#comments" class="comments-link">  <%# TBD: need to create expanded post page and redirect to comments section %>
+                            <%= post.comments.length %> comment<%= post.comments.length !== 1 ? 's' : '' %>
+                        </a>
+                    </div>
+                </div>
+            </li>
+            <vr style="height: 1px; background-color: #414040;"></vr>
+        <% }) %>
+    </ol>
+</body>
