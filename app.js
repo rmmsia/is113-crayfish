@@ -59,9 +59,16 @@ let posts = [
 const server = express();
 const port = process.env.PORT || 3000;
 const path = require("path");
+const Post = require('./models/Post');
 
 // set environment variables from .env file
 require("dotenv").config();
+
+server.set("view engine", "ejs")
+
+server.use("/", express.static(path.join(__dirname, "public")));
+server.use(express.json());
+server.use(express.urlencoded({ extended: true}));
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB Atlas'))
