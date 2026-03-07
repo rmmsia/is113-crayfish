@@ -10,6 +10,8 @@ const Post = require('./models/Post');
 
 // set environment variables from .env file
 require("dotenv").config();
+const indexRoutes = require('./routes/index')
+const inviteRoutes = require('./routes/invite')
 
 server.set("view engine", "ejs")
 
@@ -55,64 +57,8 @@ let posts = [
 ];
 
 server.use('/', authRoutes);
-
-server.get('/profile', (req, res) => {
-  const user = {
-    username: "username",
-    invite: "admin",
-    karma: 67,
-    totalPosts: 2,
-    totalComments: 120,
-    about: "I was dropped as a child",
-    joinedAt: "2026-03-05T07:00:00Z"
-  }
-  
-  res.render("profile", {
-    user
-  })
-})
-
-//Invitation Page 
-server.get('/invitation', (req, res) => {
-  res.render("invitation", {
-    invite : null
-  })
-})
-
-//Generate-invitation Process
-server.post('/generate-invitation', (req,res) => {
-  const inviteCode = Math.random().toString(36).substring(2, 10);
-  const inviteLink = `http://localhost:3000/register?invite=${inviteCode}`;
-
-  const invite = {
-    inviteID: inviteCode, 
-    sent: true,
-    status: "pending", 
-    invitedUser: "Li Jiannan", 
-    inviteLink
-  }
-
-  res.render("invitation", {
-    invite
-  });
-
-})
-
-// Route to home page sorted by top posts by default
-// server.get('/home', (req, res) => {
-//   // TBD: some function to sort posts before rendering them?
-
-//   res.render("home", { posts })
-// });
-
-server.get('/home', async (req, res) => {
-    try {
-        const posts = await Post.find().sort({ createdAt: -1 });
-        res.render('home', { posts });
-    } catch (err) {
-        res.status(500).send(err.message);
-    }
-});
+server.use('/', indexRoutes);
+server.use('/', inviteRoutes);
 
 server.get('/', (req, res) => {
   res.redirect(`/home`);
