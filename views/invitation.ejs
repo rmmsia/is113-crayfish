@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <%- include('header') %>
+    <h1>Invite a Friend</h1>
+    <form action="/generate-invitation" method="post">
+        <button type="submit">Generate a invite link</button>
+    </form>
+    <% if (invite != null) { %>
+     <h2>Invites</h2>
+     <p>
+        Invitation Link: <%= invite.inviteLink %>
+        <br><br>
+        <a href=""></a><b><u>Click here to copy</u></b>
+     </p>
+     <table border="1" class="invite-table" >
+        <tr>
+            <th><b>InviteID</b></th>
+            <th><b>Sent</b></th>
+            <th><b>Status</b></th>
+            <th><b>Invited User</b></th>
+        </tr>
+
+        <tr>
+            <td><%= invite.inviteID %></td>
+            <td><%= invite.sent ? "Yes" : "No" %></td>
+            <td><%= invite.status %></td>
+            <td><%= invite.invitedUser %></td>
+        </tr>
+     </table>
+
+     <style>
+        .invite-table {
+            width: 70%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .invite-table th {
+            background-color: #f2f2f2;
+            padding: 10px;
+        }
+
+        .invite-table td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+
+    <% } %>
+</body
