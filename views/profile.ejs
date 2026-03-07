@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Crayfish - Profile</title>
+</head>
+<body>
+  <%- include('header') %>
+  <h1><%= user.username %></h1>
+
+  <p>Joined: <%= new Date(user.joinedAt).toLocaleDateString('en-GB') %> by invitation from <%= user.invite %></p>
+  <p>About: <%= user.about %></p>
+</body>
+</html>
