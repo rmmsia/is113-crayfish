@@ -45,6 +45,22 @@ let posts = [
 
 server.use('/', authRoutes);
 
+server.get('/profile', (req, res) => {
+  const user = {
+    username: "username",
+    invite: "admin",
+    karma: 67,
+    totalPosts: 2,
+    totalComments: 120,
+    about: "I was dropped as a child",
+    joinedAt: "2026-03-05T07:00:00Z"
+  }
+  
+  res.render("profile", {
+    user
+  })
+})
+
 // Route to home page sorted by top posts by default
 server.get('/home', (req, res) => {
   // TBD: some function to sort posts before rendering them?

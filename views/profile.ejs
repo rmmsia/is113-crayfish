@@ -6,8 +6,11 @@
 <body>
   <%- include('header') %>
   <h1><%= user.username %></h1>
-
+  
   <p>Joined: <%= new Date(user.joinedAt).toLocaleDateString('en-GB') %> by invitation from <%= user.invite %></p>
+  <p>Karma: <%= user.karma %></p>
+  <p>Posts Submitted: <%= user.totalPosts %></p>
+  <p>Comments Submitted: <%= user.totalComments %></p>
   <p>About: <%= user.about %></p>
 </body>
 </html>
