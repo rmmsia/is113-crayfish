@@ -1,14 +1,22 @@
 const express = require('express');
-
-const server = express();
-const port = 3000;
-const path = require("path");
+const mongoose = require('mongoose');
 
 const authRoutes = require('./routes/auth')
 
 server.set("view engine", "ejs")
 
 server.use("/", express.static(path.join(__dirname, "public")));
+
+const server = express();
+const port = process.env.PORT || 3000;
+const path = require("path");
+
+// set environment variables from .env file
+require("dotenv").config();
+
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => console.log('Connected to MongoDB Atlas'))
+  .catch(err => console.log('Connection error: ', err));
 
 // remove and replace with DB retrieval once implemented
 let posts = [
