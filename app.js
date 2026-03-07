@@ -3,16 +3,19 @@ const mongoose = require('mongoose');
 
 const authRoutes = require('./routes/auth')
 
-server.set("view engine", "ejs")
-
-server.use("/", express.static(path.join(__dirname, "public")));
-
 const server = express();
 const port = process.env.PORT || 3000;
 const path = require("path");
+const Post = require('./models/Post');
 
 // set environment variables from .env file
 require("dotenv").config();
+
+server.set("view engine", "ejs")
+
+server.use("/", express.static(path.join(__dirname, "public")));
+server.use(express.json());
+server.use(express.urlencoded({ extended: true}));
 
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB Atlas'))
@@ -54,14 +57,47 @@ let posts = [
 server.use('/', authRoutes);
 
 // Route to home page sorted by top posts by default
-server.get('/home', (req, res) => {
-  // TBD: some function to sort posts before rendering them?
+// server.get('/home', (req, res) => {
+//   // TBD: some function to sort posts before rendering them?
 
-  res.render("home", { posts })
+//   res.render("home", { posts })
+// });
+
+server.get('/home', async (req, res) => {
+    try {
+        const posts = await Post.find().sort({ createdAt: -1 });
+        res.render('home', { posts });
+    } catch (err) {
+        res.status(500).send(err.message);
+    }
 });
 
 server.get('/', (req, res) => {
-  res.send(`Hello world!`);
+  res.redirect(`/home`);
+});
+
+server.get('/create-post', (req, res) => {
+  res.render("create-post")
+}); 
+
+server.post('/create-post', async (req, res) => {
+  try {
+    const { title, imageURL, description } = req.body;
+
+    const post = new Post({
+      title,
+      imageURL,
+      description,
+      author: 'Anonymous',
+      upvotes: 0,
+      downvotes: 0
+    });
+
+    await post.save();
+    res.redirect('/home');
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 
 server.listen(port, () => {
