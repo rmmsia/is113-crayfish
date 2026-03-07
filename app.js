@@ -5,94 +5,16 @@ const port = 3000;
 const path = require("path");
 
 const authRoutes = require('./routes/auth')
+const indexRoutes = require('./routes/index')
+const inviteRoutes = require('./routes/invite')
 
 server.set("view engine", "ejs")
 
 server.use("/", express.static(path.join(__dirname, "public")));
 
-// remove and replace with DB retrieval once implemented
-let posts = [
-  {
-    id: 1,
-    title: "haha so funny",
-    imageURL: "https://media.tenor.com/BuSEbkm9aAIAAAAi/hi-otag.gif",
-    //redirectURL: "",  -- needed?
-    author: "admin",
-    upvotes: 4,
-    downvotes: 0,
-    // tags: ["funny, idk"],  -- if got time to implement tags
-    comments: [
-      {author: "admin2", body: "haha", datetime: "2026-03-04T09:00:00Z"}, // datetime using ISO 8601 format, with Z at the end indicating UTC timezone
-      {author: "admin3", body: "not funny bro", datetime: "2026-03-04T12:00:00Z"} // datetime using ISO 8601 format, with Z at the end indicating UTC timezone
-    ],
-    datetime: "2026-03-04T05:00:00Z" // datetime using ISO 8601 format, with Z at the end indicating UTC timezone
-  },
-  {
-    id: 2,
-    title: "funny",
-    imageURL: "https://media1.tenor.com/m/B-uBLzMr9BwAAAAd/low-cortisol.gif",
-    //redirectURL: "",  -- needed?
-    author: "admin3",
-    upvotes: 2,
-    downvotes: 3,
-    // tags: ["funny, idk"],  -- if got time to implement tags
-    comments: [
-      {author: "admin2", body: "test", datetime: "2026-03-06T02:00:00Z"} // datetime using ISO 8601 format, with Z at the end indicating UTC timezone
-    ],
-    datetime: "2026-03-05T07:00:00Z" // datetime using ISO 8601 format, with Z at the end indicating UTC timezone
-  }
-];
-
 server.use('/', authRoutes);
-
-server.get('/profile', (req, res) => {
-  const user = {
-    username: "username",
-    invite: "admin",
-    karma: 67,
-    totalPosts: 2,
-    totalComments: 120,
-    about: "I was dropped as a child",
-    joinedAt: "2026-03-05T07:00:00Z"
-  }
-  
-  res.render("profile", {
-    user
-  })
-})
-
-//Invitation Page 
-server.get('/invitation', (req, res) => {
-  res.render("invitation", {
-    invite : null
-  })
-})
-
-//Generate-invitation Process
-server.post('/generate-invitation', (req,res) => {
-  const inviteCode = Math.random().toString(36).substring(2, 10);
-  const inviteLink = `http://localhost:3000/register?invite=${inviteCode}`;
-
-  const invite = {
-    inviteID: inviteCode, 
-    sent: true,
-    status: "pending", 
-    invitedUser: "Li Jiannan", 
-    inviteLink
-  }
-
-  res.render("invitation", {
-    invite
-  });
-
-})
-
-// Route to home page sorted by top posts by default
-server.get('/home', (req, res) => {
-  // TBD: some function to sort posts before rendering them?
-
-  res.render("home", { posts })
-});
+server.use('/', indexRoutes);
+server.use('/', inviteRoutes);
 
 server.get('/', (req, res) => {
   res.send(`Hello world!`);
