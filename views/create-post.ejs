@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Crayfish: Create Post</title>
+    <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+    <%- include('header') %>
+
+    <main>
+        <div class="form-container">
+            <h1>Create a Post</h1>
+            <form action="/create-post" method="POST">
+                <div class="form-group">
+                    <label for="title">Title <span class="required">*</span></label>
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        placeholder="Enter a title"
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="imageURL">Image URL</label>
+                    <input
+                        type="url"
+                        id="imageURL"
+                        name="imageURL"
+                        placeholder="https://example.com/image.jpg"
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea
+                        id="description"
+                        name="description"
+                        placeholder="What's on your mind?"
+                        rows="5"
+                    ></textarea>
+                </div>
+
+                <button type="submit">Post</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>
