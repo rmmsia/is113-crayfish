@@ -54,7 +54,6 @@ let posts = [
 router.get('/home', async (req, res) => {
     try {
         const posts = await Post.find().sort({ createdAt: -1 });
-        console.log('Posts:', posts); // check what comes from DB
         res.render('home', { posts });
     } catch (err) {
         console.error('Error rendering /home:', err); // <- this will show the real reason for 500
