@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Post = require('../models/Post');
+const { requireLogin } = require('../middleware/auth');
 
 router.get('/profile', (req , res) => {
   const user = {
@@ -51,7 +52,7 @@ let posts = [
   }
 ];
 
-router.get('/home', async (req, res) => {
+router.get('/home', requireLogin, async (req, res) => {
     try {
         const posts = await Post.find().sort({ createdAt: -1 });
         res.render('home', { posts });
