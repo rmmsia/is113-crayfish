@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>User Tree</title>
+  <style>
+    pre {
+      font-family: monospace;
+      line-height: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <h1>User Invite Tree</h1>
+  <pre>
+<pre>
+<% 
+function renderAscii(node, prefix = '', isLast = true, isRoot = false) { 
+%>
+<%= isRoot ? node.username : prefix + (isLast ? '└── ' : '├── ') + node.username %>
+<% 
+  if (node.children && node.children.length > 0) {
+    const newPrefix = prefix + (isLast ? '    ' : '│   ');
+    node.children.forEach((child, i) => {
+      renderAscii(child, newPrefix, i === node.children.length - 1);
+    });
+  }
+} 
+%>
+
+<% tree.forEach(root => { renderAscii(root, '', true, true); }) %>
+  </pre>
+</body>
+</html>
