@@ -1,5 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const session = require("express-session");
 
 const authRoutes = require('./routes/auth')
 const indexRoutes = require('./routes/index')
@@ -10,8 +11,19 @@ const port = process.env.PORT || 3000;
 const path = require("path");
 const Post = require('./models/Post');
 
+const { requireLogin } = require("./middleware/auth");
+
 // set environment variables from .env file
 require("dotenv").config();
+
+server.use(
+  session({
+    secret: process.env.SESSION_SECRET || "supersecretkey",
+    resave: false,
+    saveUninitialized: false,
+    cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 day
+  })
+);
 
 server.set("view engine", "ejs")
 
@@ -27,15 +39,19 @@ server.use('/', authRoutes);
 server.use('/', indexRoutes);
 server.use('/', inviteRoutes);
 
-server.get('/', (req, res) => {
-  res.redirect(`/home`);
+server.get("/", (req, res) => {
+  if (req.session.userId) {
+    return res.redirect("/home");
+  } else {
+    return res.redirect("/login");
+  }
 });
 
-server.get('/create-post', (req, res) => {
+server.get('/create-post', requireLogin, (req, res) => {
   res.render("create-post")
 }); 
 
-server.post('/create-post', async (req, res) => {
+server.post('/create-post', requireLogin, async (req, res) => {
   try {
     const { title, imageURL, description } = req.body;
 
@@ -43,7 +59,7 @@ server.post('/create-post', async (req, res) => {
       title,
       imageURL,
       description,
-      author: 'Anonymous',
+      author: req.user.username,
       upvotes: 0,
       downvotes: 0
     });

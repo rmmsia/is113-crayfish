@@ -8,7 +8,6 @@ router.get('/register', (req , res) => {
 
 router.post('/register', async (req, res) => {
     const { username, email, password, invite, vcode } = req.body;
-    console.log('Form submitted:', { username, email, password, invite, vcode });
 
     try {
       const newUser = User({ username, password, email });
@@ -22,5 +21,23 @@ router.post('/register', async (req, res) => {
 router.get('/login', (req, res) => {
   res.render('auth/login')
 })
+
+router.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    try {
+        const user = await User.findOne({ username });
+        if (!user) {
+            return res.render('login', { error: 'Invalid username or password' });
+        }
+        const isMatch = await user.comparePassword(password);
+        if (!isMatch) {
+            return res.render('login', { error: 'Invalid username or password' });
+        }
+        req.session.userId = user._id;
+        res.redirect('/home');
+    } catch (err) {
+        res.status(500).send('Server error: ' + err.message);
+    }
+});
 
 module.exports = router;
