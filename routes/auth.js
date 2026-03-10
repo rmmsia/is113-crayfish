@@ -50,6 +50,7 @@ router.get('/logout', (req, res) => {
         if (err) {
             return res.status(500).send('Could not log out. Please try again.');
         }
+        res.clearCookie('connect.sid');
         res.redirect('/login');
     });
 });
