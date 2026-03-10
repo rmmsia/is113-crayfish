@@ -12,8 +12,6 @@ const Post = require('./models/Post');
 
 // set environment variables from .env file
 require("dotenv").config();
-const indexRoutes = require('./routes/index')
-const inviteRoutes = require('./routes/invite')
 
 server.set("view engine", "ejs")
 

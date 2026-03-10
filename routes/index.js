@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const Post = require('../models/Post');
 
 router.get('/profile', (req , res) => {
   const user = {
@@ -50,10 +51,15 @@ let posts = [
   }
 ];
 
-// Route to home page sorted by top posts by default
-router.get('/home', (req, res) => {
-  // TBD: some function to sort posts before rendering them?
-  res.render("home", { posts })
-})
+router.get('/home', async (req, res) => {
+    try {
+        const posts = await Post.find().sort({ createdAt: -1 });
+        console.log('Posts:', posts); // check what comes from DB
+        res.render('home', { posts });
+    } catch (err) {
+        console.error('Error rendering /home:', err); // <- this will show the real reason for 500
+        res.status(500).send(err.message);
+    }
+});
 
 module.exports = router;
