@@ -9,26 +9,34 @@
     <%- include('header') %>
     <h1>Invite a Friend</h1>
     <form action="/generate-invitation" method="post">
+        <p>To create an invitation, please enter the email of the person you would like to invite to join Crayfish.</p>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" value="<%= email || '' %>" required>
+
+        <% if (error) { %>
+            <p style="color:red;"><%= error %></p>
+        <% } %>
+
+        <br><br>
         <button type="submit">Generate a invite link</button>
     </form>
     <% if (invite != null) { %>
      <h2>Invites</h2>
-     <p>
+     <!-- <p>
         Invitation Link: <%= invite.inviteLink %>
         <br><br>
         <a href=""></a><b><u>Click here to copy</u></b>
-     </p>
+     </p> -->
      <table border="1" class="invite-table" >
         <tr>
             <th><b>InviteID</b></th>
-            <th><b>Sent</b></th>
             <th><b>Status</b></th>
             <th><b>Invited User</b></th>
         </tr>
 
         <tr>
             <td><%= invite.inviteID %></td>
-            <td><%= invite.sent ? "Yes" : "No" %></td>
             <td><%= invite.status %></td>
             <td><%= invite.invitedUser %></td>
         </tr>
