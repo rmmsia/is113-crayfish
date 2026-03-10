@@ -1,10 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
-server.use(express.urlencoded({ extended: true })); 
-server.use(express.json());
-
-
 const authRoutes = require('./routes/auth')
 const indexRoutes = require('./routes/index')
 const inviteRoutes = require('./routes/invite')
