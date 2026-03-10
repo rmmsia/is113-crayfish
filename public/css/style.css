@@ -49,14 +49,16 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0;
+  padding: 1.5rem 1rem;
+  max-width: 900px;
+  margin: 0 auto;
+  box-sizing: border-box;
 }
 .post-card {
-  display: grid;
-  grid-template-columns: 2rem 3rem 120px 1fr;
-  gap: 0 1rem;
-  align-items: center;
-  padding: 1rem 0;
-  border-bottom: 1px solid 2px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 1rem;
 }
 .post-card:hover { background: rgba(255,255,255,0.02); }
 
@@ -116,7 +118,7 @@ body {
 
 .post-thumbnail-link:hover .post-thumbnail { filter: grayscale(0%); }
 
-.post-body { display: flex; flex-direction: column; gap: 0.3rem; }
+.post-body { display: flex; flex-direction: column; gap: 0.3rem; min-width: max-content; }
 
 .post-title {
   font-size: 1.3rem;
@@ -138,6 +140,21 @@ body {
 .author { color: #9dae00; }
 
 .comments-link { color: #414040; }
+
+.post-page {
+  padding: 1.5rem 1rem;
+}
+
+.post-page .post-card {
+  width: min(100%, 900px);
+  margin: 0 auto;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.post-page .post-body {
+  min-width: 0;
+}
 
 .register-page {
   margin: 2rem auto;
@@ -178,4 +195,8 @@ body {
 
 .register-form .form-actions .btn-submit {
   padding: 0.5rem;
+}
+
+.error {
+  color: oklch(64.5% 0.246 16.439);
 }

@@ -27,4 +27,18 @@ router.post('/create-post', requireLogin, async (req, res) => {
   }
 });
 
+router.get('/post/:id', requireLogin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const post = await Post.findById(id);
+
+    res.render('posts/post', {
+      post
+    })
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+})
+
 module.exports = router;
