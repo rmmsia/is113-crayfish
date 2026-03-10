@@ -1,22 +1,39 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const Invite = require('../models/Invite');
 
 router.get('/register', (req , res) => {
   res.render('auth/register')
 })
 
 router.post('/register', async (req, res) => {
-    const { username, email, password, invite, vcode } = req.body;
+    const { username, email, password, inviter, vcode } = req.body;
+
+    // verify invite and vcode
+    const invite = await Invite.findOne({
+      createdBy: inviter,
+      code: vcode,
+      targetEmail: email,
+      status: "Pending"
+    });
+
+    if (!invite) {
+      return res.status(400).send('Invalid invite code or email.');
+    }
 
     try {
       const newUser = User({
         username,
         password,
         email,
-        invitedBy: invite || null
+        invitedBy: inviter || null
       });
       await newUser.save();
+
+      // update invite status
+      invite.status = "Used";
+      await invite.save();
       res.redirect('/login');
     } catch (err) {
       res.status(400).send('Error registering user: ' + err.message);
