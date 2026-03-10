@@ -10,6 +10,8 @@ const userSchema = new mongoose.Schema({
         unique: true,
         match: /.+\@.+\..+/
     },
+    invitedBy: { type: String },
+    about: { type: String },
     createdAt: { type: Date, default: Date.now }
 });
 

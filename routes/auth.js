@@ -10,7 +10,12 @@ router.post('/register', async (req, res) => {
     const { username, email, password, invite, vcode } = req.body;
 
     try {
-      const newUser = User({ username, password, email });
+      const newUser = User({
+        username,
+        password,
+        email,
+        invitedBy: invite || null
+      });
       await newUser.save();
       res.redirect('/login');
     } catch (err) {
