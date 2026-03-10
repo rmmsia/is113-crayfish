@@ -49,11 +49,11 @@ router.post('/login', async (req, res) => {
     try {
         const user = await User.findOne({ username });
         if (!user) {
-            return res.render('login', { error: 'Invalid username or password' });
+            return res.render('auth/login', { error: 'Invalid username or password' });
         }
         const isMatch = await user.comparePassword(password);
         if (!isMatch) {
-            return res.render('login', { error: 'Invalid username or password' });
+            return res.render('auth/login', { error: 'Invalid username or password' });
         }
         req.session.userId = user._id;
         res.redirect('/home');

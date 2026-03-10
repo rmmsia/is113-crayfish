@@ -2,16 +2,14 @@ const express = require('express');
 const mongoose = require('mongoose');
 const session = require("express-session");
 
-const authRoutes = require('./routes/auth')
-const indexRoutes = require('./routes/index')
-const inviteRoutes = require('./routes/invite')
+const authRoutes = require('./routes/auth');
+const indexRoutes = require('./routes/index');
+const inviteRoutes = require('./routes/invite');
+const postRoutes = require('./routes/post');
 
 const server = express();
 const port = process.env.PORT || 3000;
 const path = require("path");
-const Post = require('./models/Post');
-
-const { requireLogin } = require("./middleware/auth");
 
 // set environment variables from .env file
 require("dotenv").config();
@@ -38,36 +36,13 @@ mongoose.connect(process.env.MONGO_URI)
 server.use('/', authRoutes);
 server.use('/', indexRoutes);
 server.use('/', inviteRoutes);
+server.use('/', postRoutes);
 
 server.get("/", (req, res) => {
   if (req.session.userId) {
     return res.redirect("/home");
   } else {
     return res.redirect("/login");
-  }
-});
-
-server.get('/create-post', requireLogin, (req, res) => {
-  res.render("create-post")
-}); 
-
-server.post('/create-post', requireLogin, async (req, res) => {
-  try {
-    const { title, imageURL, description } = req.body;
-
-    const post = new Post({
-      title,
-      imageURL,
-      description,
-      author: req.user.username,
-      upvotes: 0,
-      downvotes: 0
-    });
-
-    await post.save();
-    res.redirect('/home');
-  } catch (err) {
-    res.status(500).send(err.message);
   }
 });
 
