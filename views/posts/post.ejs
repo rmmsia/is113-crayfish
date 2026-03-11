@@ -4,37 +4,49 @@
   <% if (post) { %>
     <title>Crayfish: Post - <%= post.title %></title>
   <% } %>
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 
 <body>
   <%- include('../header') %>
   <main class="post-page">
-    <div class="post-card">
-      <div class="voting-col">
-        <button class="up vote-btn" data-id="<%= post.id %>" data-dir="up" title="upvote">▲</button>
-        <span class="score" data-id="<%= post.id %>"><%= post.upvotes - post.downvotes %></span>
-        <button class="down vote-btn" data-id="<%= post.id %>" data-dir="down" title="downvote">▼</button>
+      <div class="post-head">
+        <div class="voting-col">
+          <button class="up vote-btn" data-id="<%= post.id %>" data-dir="up" title="upvote">▲</button>
+          <span class="score" data-id="<%= post.id %>"><%= post.upvotes - post.downvotes %></span>
+          <button class="down vote-btn" data-id="<%= post.id %>" data-dir="down" title="downvote">▼</button>
+        </div>
+        <h2 style="padding-left: 10px;"><%= post.title %></h2>
       </div>
-
+      
       <% if (post.imageURL) { %>
-        <a href="/post/<%= post.id %>" class="post-thumbnail-link">
-          <img class="post-thumbnail" src="<%= post.imageURL %>" alt="<%= post.title %>" loading="lazy" />
+        <a href="/post/<%= post.id %>">
+          <img class="post-img-expanded" src="<%= post.imageURL %>" alt="<%= post.title %>" loading="lazy" />
         </a>
       <% } %>
 
       <div class="post-body">
-        <h3 class="post-title"><%= post.title %></h3>
         <span class="description"><%= post.description %></span>
-        <br>
+        <br />
         <div class="post-sub">
-          <span class="author">@<%= post.author %></span>
+          <span class="author">By @<%= post.author %></span>
           <span class="dot">·</span>
-          <span class="time"><%= post.createdAt.toDateString() %></span>
-          <span class="dot">·</span>
-          <a href="/post/<%= post.id %>#comments" class="comments-link">0 comments</a>
+          <span class="time"><%= post.createdAt.toLocaleDateString() %></span>
         </div>
+        <hr style="background-color:grey; width: 100%;">
+        <h3 id="comments"><%= post.comments.length %> comment<%= post.comments.length === 1 ? '' : 's' %></h3>
+        <form action="/post/<%= post._id %>/add-comment" method="post">
+          <textarea name="add_comment" id="add_comment" rows="5" style="width:100%" placeholder="Write a Comment here..."></textarea><br />
+          <button type="submit">Post</button>
+        </form>
+        <% post.comments.reverse().forEach(item => { %>
+          <div class="comment-field">
+            <strong>@<%= item.author %>:</strong><br />
+            <%= item.text %><br />
+            <span class="comment-date">Posted on <%= item.createdAt.toLocaleString() %></span>
+          </div>
+        <% }) %>
       </div>
-    </div>
-  </main>
+    </main>
 </body>
 </html>

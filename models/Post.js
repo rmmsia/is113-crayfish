@@ -6,7 +6,8 @@ const postSchema = new mongoose.Schema({
     description: {type: String},
     author: {type: String},
     upvotes: {type: Number},
-    downvotes: {type: Number}
+    downvotes: {type: Number},
+    comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }]
 }, { timestamps: true });
 
 module.exports = mongoose.model('Post', postSchema);

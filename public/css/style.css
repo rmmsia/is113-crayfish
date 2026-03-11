@@ -200,3 +200,31 @@ body {
 .error {
   color: oklch(64.5% 0.246 16.439);
 }
+
+.post-head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.post-img-expanded {
+  object-fit: cover;
+  height: 30vh;
+  width: auto;
+  max-width: 100vh;
+}
+
+.comment-field {
+  padding: 10px;
+  white-space: pre-wrap;
+}
+
+.comment-date {
+  padding-top: 10px;
+  font-style: italic;
+  font-size: small;
+}
+
+.description {
+  white-space: pre-wrap;
+}
