@@ -7,6 +7,7 @@ router.get('/register', (req , res) => {
   res.render('auth/register')
 })
 
+// potentially refactor as the route is getting long
 router.post('/register', async (req, res) => {
     const { username, email, password, inviter, vcode } = req.body;
 
@@ -20,6 +21,12 @@ router.post('/register', async (req, res) => {
 
     if (!invite) {
       return res.status(400).send('Invalid invite code or email.');
+    }
+
+    // check if username is taken
+    const existingUser = await User.findOne({ username: username });
+    if (existingUser) {
+      return res.status(400).send('Username already taken.');
     }
 
     try {
