@@ -216,7 +216,7 @@ body {
 
 .comment-field {
   padding: 10px;
-  white-space: pre-wrap;
+  white-space: pre-line;
 }
 
 .comment-date {
@@ -226,5 +226,5 @@ body {
 }
 
 .description {
-  white-space: pre-wrap;
+  white-space: pre-line;
 }
