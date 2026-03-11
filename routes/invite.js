@@ -12,18 +12,36 @@ router.get('/invitation', requireLogin, (req, res) => {
   })
 })
 
-//Generate-invitation Process
+// invite generation (potentially refactor as the route is getting long)
 router.post('/generate-invitation', requireLogin, async (req, res) => {
   const email = req.body.email;
   const inviteCode = Math.random().toString(36).substring(2, 10);
 
   try {
+    // check if email is valid format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.render("invitation", {
+        error: "Please enter a valid email address.",
+        email: email,
+        invite: null
+      });
+    }
     // Check if invite already exists
     const existingInvite = await Invite.findOne({ targetEmail: email });
 
     if (existingInvite) {
       return res.render("invitation", {
         error: "This email already has an invite.",
+        email: email,
+        invite: null
+      });
+    }
+
+    // check if user is trying to invite themselves
+    if (email === req.user.email) {
+      return res.render("invitation", {
+        error: "You cannot invite yourself.",
         email: email,
         invite: null
       });
