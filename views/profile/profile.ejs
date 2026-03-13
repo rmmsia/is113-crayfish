@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Crayfish: <%= user.username %>'s Profile</title>
+</head>
+<body>
+  <%- include('../header') %>
+  <h1><%= user.username %></h1>
+  
+  <p>Joined: <%= new Date(user.createdAt).toLocaleDateString('en-GB') %> by invitation from <%= user.invitedBy %></p>
+  <p>Karma: <%= totalKarma %></p>
+  <p>Posts Submitted: <%= totalPosts %></p>
+  <p>Comments Submitted: <%= totalComments %></p>
+  <p>About: <%= user.about %></p>
+
+  <% if (isUser) { %>
+    <h1>Settings</h1>
+
+    <a href="/update-profile">Update About</a><br><br>
+    <a href="/invitation">Invite New User</a><br><br>
+    <a href="/logout">Logout</a>
+  <% } %>
+
+</body>
+</html>

@@ -29,7 +29,7 @@
         <span class="description"><%= post.description %></span>
         <br />
         <div class="post-sub">
-          <span class="author">By @<%= post.author %></span>
+          <span class="author">By <a href="/profile/<%= post.author %>" class="author">@<%= post.author %></a></span>
           <span class="dot">·</span>
           <span class="time"><%= post.createdAt.toLocaleDateString() %></span>
         </div>
