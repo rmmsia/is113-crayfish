@@ -214,15 +214,37 @@ body {
   max-width: 100vh;
 }
 
+.comment-container {
+  display: flex;
+  align-items: flex-start;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  margin: 5px;
+}
+
 .comment-field {
-  padding: 10px;
+  padding: 5px;
+  flex: 1;
+}
+
+.comment-text {
   white-space: pre-line;
+  margin-left: 15px;
+  display: block;
 }
 
 .comment-date {
-  padding-top: 10px;
   font-style: italic;
   font-size: small;
+}
+
+.comment-buttons {
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  align-items: end;
+  margin-right: 10px;
+  gap: 5px;
 }
 
 .description {

@@ -46,21 +46,61 @@ router.post('/post/:id/add-comment', requireLogin, async (req, res) => {
             { $push: { comments: savedComment._id } }, 
             { new: true }
         );
-    console.log(updatedPost);
   } catch (err) {
     console.error(err);
   }
   res.redirect(`/post/${id}`);
 });
 
+router.post('/post/:postId/:commentId/delete', requireLogin, async (req, res) => {
+  const { postId, commentId } = req.params;
+  const comment = await Comment.findById(commentId);
+  const user = req.user.username;
+  try {
+    if (!commentId) {
+      res.status(404).send("Comment doesn't exist");
+    } else if (user !== comment.author) {
+      res.status(404).send("Unauthorized to delete other users' comments");
+    } else {
+      await Comment.findByIdAndDelete(commentId);
+      await Post.findByIdAndUpdate(comment.post, {
+        $pull: { comments: commentId }
+      });
+      res.redirect(`/post/${postId}`);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+
+router.post('/post/:postId/:commentId/edit', requireLogin, async (req, res) => {
+  const { postId, commentId } = req.params;
+  const updatedText = req.body.updated_comment;
+  const comment = await Comment.findById(commentId);
+  const user = req.user.username;
+  try {
+    if (!updatedText) {
+      res.status(404).send("Comment doesn't exist");
+    } else if (user !== comment.author) {
+      res.status(404).send("Unauthorized to edit other users' comments");
+    } else {
+      comment.text = updatedText;
+      await comment.save();
+      res.redirect(`/post/${postId}`);
+    }
+  } catch (err) {
+    console.error(err);
+  }
+});
+
 router.get('/post/:id', requireLogin, async (req, res) => {
   try {
     const { id } = req.params;
-
+    const user = req.user.username;
     const post = await Post.findById(id).populate('comments');
 
     res.render('posts/post', {
-      post
+      post, user
     })
   } catch (err) {
     res.status(500).send(err.message);
