@@ -14,7 +14,7 @@
     <ol class="post-list">
         <% posts.forEach((post, i) => { %>
             <li class="post-card" data-id="<%= post.id %>">
-                <div class="rank">#<%= i + 1 %></div>
+                <div class="rank"># <%= i + 1 < 10 ? '0' : '' %><%= i + 1 %></div>
 
                 <div class="voting-col">
                     <button class="up vote-btn" data-id="<%= post.id %>" data-dir="up" title="upvote">▲</button>
@@ -35,11 +35,11 @@
                         <span class="dot">·</span>
                         <span class="time"><%= post.createdAt.toDateString() %></span>
                         <span class="dot">·</span>
-                        <a href="/post/<%= post.id %>#comments" class="comments-link">0 comments</a>
+                        <a href="/post/<%= post.id %>#comments" class="comments-link"><%= post.comments.length %> comment<%= post.comments.length === 1 ? '' : 's' %></a>
                     </div>
                 </div>
             </li>
-            <hr class="post-divider" />
+            <br><br>
         <% }) %>
     </ol>
 </body>

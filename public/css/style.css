@@ -200,3 +200,53 @@ body {
 .error {
   color: oklch(64.5% 0.246 16.439);
 }
+
+.post-head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.post-img-expanded {
+  object-fit: cover;
+  height: 30vh;
+  width: auto;
+  max-width: 100vh;
+}
+
+.comment-container {
+  display: flex;
+  align-items: flex-start;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  margin: 5px;
+}
+
+.comment-field {
+  padding: 5px;
+  flex: 1;
+}
+
+.comment-text {
+  white-space: pre-line;
+  margin-left: 15px;
+  display: block;
+}
+
+.comment-date {
+  font-style: italic;
+  font-size: small;
+}
+
+.comment-buttons {
+  display: flex;
+  flex-direction: column;
+  padding-top: 10px;
+  align-items: end;
+  margin-right: 10px;
+  gap: 5px;
+}
+
+.description {
+  white-space: pre-line;
+}
