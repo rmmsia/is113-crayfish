@@ -5,12 +5,14 @@ body {
 .header {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   padding: 1rem;
   position: sticky;
   top: 0;
   z-index: 100;
-  background: darkgrey;
+  background: white;
+
+  border-bottom: 2px solid #777;
 }
 
 .profile-icon {
@@ -18,12 +20,21 @@ body {
   right: 1rem;
   top: 50%;
   transform: translateY(-50%);
-  text-decoration: none;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
 }
 
-.profile-icon img {
-  width: 3rem;
-  display: block;
+.create-post {
+  border: 1px solid black;
+  padding: 4px 10px;
+  text-decoration: none;
+  color: black;
+}
+
+.profile-link {
+  text-decoration: none;
+  color: black;
 }
 
 .logo {
