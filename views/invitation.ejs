@@ -21,13 +21,9 @@
         <br><br>
         <button type="submit">Generate a invite link</button>
     </form>
-    <% if (invite != null) { %>
+    
+    <% if (inviteList && inviteList.length > 0) { %>
      <h2>Invites</h2>
-     <!-- <p>
-        Invitation Link: <%= invite.inviteLink %>
-        <br><br>
-        <a href=""></a><b><u>Click here to copy</u></b>
-     </p> -->
      <table border="1" class="invite-table" >
         <tr>
             <th><b>InviteID</b></th>
@@ -35,11 +31,15 @@
             <th><b>Invited User</b></th>
         </tr>
 
-        <tr>
-            <td><%= invite.inviteID %></td>
-            <td><%= invite.status %></td>
-            <td><%= invite.invitedUser %></td>
-        </tr>
+        <!-- EJS Loop to render each Invite -->    
+        <% inviteList.forEach(invitation => { %>
+            <tr>
+                <td><%= invitation.code %></td>
+                <td><%= invitation.status %></td>
+                <td><%= invitation.targetEmail %></td> 
+            </tr>
+        <% }) %>
+
      </table>
 
      <style>
