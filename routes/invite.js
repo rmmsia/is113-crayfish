@@ -3,13 +3,25 @@ const router = express.Router();
 const { requireLogin } = require('../middleware/auth')
 const Invite = require('../models/Invite');
 
+
 //Invitation Page 
-router.get('/invitation', requireLogin, (req, res) => {
-  res.render("invitation", {
+router.get('/invitation', requireLogin, async (req, res) => {
+  // Reading from Invite DB 
+  let inviteList = (await Invite.find({
+    createdBy : req.user.username
+  })).reverse();
+  console.log(inviteList)
+  try {
+    res.render("invitation", {
     invite : null,
     email: null,
-    error: null
+    error: null,
+    inviteList
   })
+  } catch (error) {
+    console.error(error);
+    res.send("Error reading database");
+  }
 })
 
 // invite generation (potentially refactor as the route is getting long)
@@ -56,6 +68,11 @@ router.post('/generate-invitation', requireLogin, async (req, res) => {
 
     await newInvite.save();
 
+    // Reading from Invite DB 
+    let inviteList = (await Invite.find({
+      createdBy : req.user.username
+    })).reverse();
+
     res.render("invitation", {
       invite: {
         inviteID: inviteCode,
@@ -63,7 +80,8 @@ router.post('/generate-invitation', requireLogin, async (req, res) => {
         invitedUser: email
       },
       error: null,
-      email
+      email,
+      inviteList
     });
 
   } catch (err) {
