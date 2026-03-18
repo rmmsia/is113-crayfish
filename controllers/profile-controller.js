@@ -1,31 +1,22 @@
-const Post = require('../models/Post');
-const Comment = require('../models/Comment');
-const User = require('../models/User');
-
-async function retrieveUserData(username) {
-  const posts = await Post.find({ author: username });
-  const totalPosts = posts.length || 0;
-  const totalComments = await Comment.find({ author: username }).countDocuments() || 0;
-  const totalKarma = posts.reduce((karma, post) => karma + ((post.upvotes - post.downvotes) || 0), 0);
-
-  return {
-    totalPosts,
-    totalComments,
-    totalKarma
-  }
-}
+const profileService = require('../services/profile-service');
 
 exports.displayUserProfile = async (req , res) => {
   const user = req.user;
-  const { totalPosts, totalComments, totalKarma } = await retrieveUserData(user.username);
-  
-  res.render("profile/profile", {
-    user,
-    totalKarma,
-    totalPosts,
-    totalComments,
-    isUser: true
-  })
+
+  try {
+    const { totalPosts, totalComments, totalKarma } = await profileService.getUserStats(user.username);
+
+    res.render("profile/profile", {
+      user,
+      totalKarma,
+      totalPosts,
+      totalComments,
+      isUser: true
+    });
+  } catch (err) {
+    console.error('Error retrieving profile: ' + err);
+    res.status(err.status || 500).send(err.message);
+  }
 }
 
 exports.visitOtherProfile = async (req, res) => {
@@ -34,11 +25,8 @@ exports.visitOtherProfile = async (req, res) => {
   if (username === req.user.username) return res.redirect('/profile');
   
   try{
-    const user = await User.findOne({ username });
-
-    if (!user) return res.status(404).send('User not found.');
-    
-    const { totalPosts, totalComments, totalKarma } = await retrieveUserData(user.username);
+    const user = await profileService.getUserByUsername(username);
+    const { totalPosts, totalComments, totalKarma } = await profileService.getUserStats(user.username);
 
     res.render("profile/profile", {
       user,
@@ -46,10 +34,10 @@ exports.visitOtherProfile = async (req, res) => {
       totalPosts,
       totalComments,
       isUser: false
-    })
+    });
   } catch (err) {
     console.error('Error retrieving profile: ' + err);
-    res.status(500).send(err.message);
+    res.status(err.status || 500).send(err.message);
   }
 }
 
@@ -66,13 +54,11 @@ exports.submitUpdateProfile = async (req, res) => {
   const user = req.user;
 
   try {
-    const newUser = await User.findByIdAndUpdate(user._id, { about: about });
-
-    if (!newUser) return res.status(404).send('User not found.');
+    await profileService.updateUserAbout({ userId: user._id, about });
 
     res.redirect('/profile');
   } catch (err) {
     console.error('Error updating profile: ' + err);
-    res.status(500).send(err.message)
+    res.status(err.status || 500).send(err.message);
   }
 }

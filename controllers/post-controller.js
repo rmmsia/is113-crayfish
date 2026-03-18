@@ -1,14 +1,21 @@
-const mongoose = require('mongoose');
-const Post = require('../models/Post');
-const Comment = require('../models/Comment');
+const postService = require('../services/post-service');
+
+function sendError(res, err, context = null) {
+  const status = err.status || 500;
+
+  if (status >= 500 && context) {
+    console.error(context, err);
+  }
+
+  res.status(status).send(err.message);
+}
 
 exports.displayPosts = async (req, res) => {
   try {
-    const posts = await Post.find().sort({ createdAt: -1 });
+    const posts = await postService.getAllPosts();
     res.render('home', { posts });
   } catch (err) {
-    console.error('Error rendering /home:', err);
-    res.status(500).send(err.message);
+    sendError(res, err, 'Error rendering /home:');
   }
 };
 
@@ -20,19 +27,16 @@ exports.createPost = async (req, res) => {
   try {
     const { title, imageURL, description } = req.body;
 
-    const post = new Post({
+    await postService.createPost({
       title,
       imageURL,
       description,
-      author: req.user.username,
-      upvotes: 0,
-      downvotes: 0
+      author: req.user.username
     });
 
-    await post.save();
     res.redirect('/posts');
   } catch (err) {
-    res.status(500).send(err.message);
+    sendError(res, err, 'Error creating post:');
   }
 };
 
@@ -42,27 +46,15 @@ exports.addComment = async (req, res) => {
   const { id } = req.params;
 
   try {
-    if (!mongoose.isValidObjectId(id)) {
-      return res.status(404).send('Post not found.');
-    }
-
-    const newComment = new Comment({
-      text: commentText,
-      author,
-      post: id
+    await postService.addCommentToPost({
+      postId: id,
+      commentText,
+      author
     });
-
-    const savedComment = await newComment.save();
-    await Post.findByIdAndUpdate(
-      id,
-      { $push: { comments: savedComment._id } },
-      { new: true }
-    );
 
     res.redirect(`/posts/${id}`);
   } catch (err) {
-    console.error(err);
-    res.status(500).send(err.message);
+    sendError(res, err, 'Error adding comment:');
   }
 };
 
@@ -71,29 +63,15 @@ exports.deleteComment = async (req, res) => {
   const user = req.user.username;
 
   try {
-    if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
-      return res.status(404).send("Comment doesn't exist");
-    }
-
-    const comment = await Comment.findById(commentId);
-
-    if (!comment) {
-      return res.status(404).send("Comment doesn't exist");
-    }
-
-    if (user !== comment.author) {
-      return res.status(404).send("Unauthorized to delete other users' comments");
-    }
-
-    await Comment.findByIdAndDelete(commentId);
-    await Post.findByIdAndUpdate(comment.post, {
-      $pull: { comments: commentId }
+    await postService.deleteCommentFromPost({
+      postId,
+      commentId,
+      username: user
     });
 
     res.redirect(`/posts/${postId}`);
   } catch (err) {
-    console.error(err);
-    res.status(500).send(err.message);
+    sendError(res, err, 'Error deleting comment:');
   }
 };
 
@@ -103,30 +81,16 @@ exports.editComment = async (req, res) => {
   const user = req.user.username;
 
   try {
-    if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
-      return res.status(404).send("Comment doesn't exist");
-    }
+    await postService.editCommentInPost({
+      postId,
+      commentId,
+      updatedText,
+      username: user
+    });
 
-    const comment = await Comment.findById(commentId);
-
-    if (!updatedText) {
-      return res.status(404).send("Comment doesn't exist");
-    }
-
-    if (!comment) {
-      return res.status(404).send("Comment doesn't exist");
-    }
-
-    if (user !== comment.author) {
-      return res.status(404).send("Unauthorized to edit other users' comments");
-    }
-
-    comment.text = updatedText;
-    await comment.save();
     res.redirect(`/posts/${postId}`);
   } catch (err) {
-    console.error(err);
-    res.status(500).send(err.message);
+    sendError(res, err, 'Error editing comment:');
   }
 };
 
@@ -135,21 +99,13 @@ exports.displayPost = async (req, res) => {
     const { id } = req.params;
     const user = req.user.username;
 
-    if (!mongoose.isValidObjectId(id)) {
-      return res.status(404).send('Post not found.');
-    }
-
-    const post = await Post.findById(id).populate('comments');
-
-    if (!post) {
-      return res.status(404).send('Post not found.');
-    }
+    const post = await postService.getPostByIdWithComments({ postId: id });
 
     res.render('posts/post', {
       post,
       user
     });
   } catch (err) {
-    res.status(500).send(err.message);
+    sendError(res, err, 'Error displaying post:');
   }
 };
