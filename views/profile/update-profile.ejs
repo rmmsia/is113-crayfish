@@ -7,7 +7,7 @@
   <%- include('../header') %>
   <h1>Edit About</h1>
   
-  <form action="/update-profile" method="post">
+  <form action="/profile/update" method="post">
     <label for="about">About:</label><br>
     <textarea name="about" id="about" rows="10" cols="80"><%= user.about %></textarea><br>
     <input type="submit" value="Update">

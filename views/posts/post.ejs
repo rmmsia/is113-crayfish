@@ -36,7 +36,7 @@
       </div>
       
       <% if (post.imageURL) { %>
-        <a href="/post/<%= post.id %>">
+        <a href="/posts/<%= post.id %>">
           <img class="post-img-expanded" src="<%= post.imageURL %>" alt="<%= post.title %>" loading="lazy" />
         </a>
       <% } %>
@@ -45,19 +45,19 @@
         <span class="description"><%= post.description %></span>
         <br />
         <div class="post-sub">
-          <span class="author">By <a href="/profile/<%= post.author %>" class="author">@<%= post.author %></a></span>
+          <span class="author">By <a href="/profile/u/<%= post.author %>" class="author">@<%= post.author %></a></span>
           <span class="dot">·</span>
           <span class="time"><%= post.createdAt.toLocaleDateString() %></span>
         </div>
         <hr style="background-color:grey; width: 100%;">
         <h3 id="comments"><%= post.comments.length %> comment<%= post.comments.length === 1 ? '' : 's' %></h3>
-        <form action="/post/<%= post._id %>/add-comment" method="post">
+        <form action="/posts/<%= post._id %>/add-comment" method="post">
           <textarea name="add_comment" id="add_comment" rows="5" style="width:100%" placeholder="Write a Comment here..." required></textarea><br />
           <button type="submit">Post</button>
         </form>
         <% post.comments.reverse().forEach(item => { %>
           <div class="comment-container">
-            <form id="edit-<%= item._id %>" action="/post/<%= post._id %>/<%= item._id %>/edit" method="post" style="display: none; margin-left: 15px;">
+            <form id="edit-<%= item._id %>" action="/posts/<%= post._id %>/<%= item._id %>/edit" method="post" style="display: none; margin-left: 15px;">
               <textarea name="updated_comment" rows="3" style="width: 100%;" required><%= item.text %></textarea>
               <div>
                 <button type="submit">Save</button>
@@ -72,7 +72,7 @@
             <% if (user === item.author) { %>
               <div class="comment-buttons" id="buttons-<%= item._id %>">
                 <button type="submit" onclick="toggleEdit('<%= item._id %>')">Edit</button>
-                <form action="/post/<%= post._id %>/<%= item._id %>/delete" method="post" onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                <form action="/posts/<%= post._id %>/<%= item._id %>/delete" method="post" onsubmit="return confirm('Are you sure you want to delete this comment?');">
                   <button type="submit">Delete</button>
                 </form>
               </div>

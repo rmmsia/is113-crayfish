@@ -3,6 +3,39 @@
 <head>
     <title>Crayfish: Create Post</title>
     <link rel="stylesheet" href="/css/style.css" />
+    <script>
+        let isValid = true;
+
+        function checkImgValidity(imgURL) {
+            if (imgURL) {
+                const img = new Image(imgURL);
+                img.src = imgURL;
+                img.onerror = function() {
+                    document.getElementById("imgErrorMsg").style.display = "block";
+                    document.getElementById("previewImg").style.display = "none";
+                    isValid = false;
+                }
+                img.onload = function() {
+                    document.getElementById("imgErrorMsg").style.display = "none";
+                    document.getElementById("previewImg").src = imgURL;
+                    document.getElementById("previewImg").style.display = "block";
+                    isValid = true;
+                }
+            } else {
+                document.getElementById("imgErrorMsg").style.display = "none";
+                document.getElementById("previewImg").style.display = "none";
+                isValid = true;
+            }
+        }
+        
+        function validatePost(event) {
+            if (!isValid) {
+                alert("The Image URL provided is invalid. Please change or remove it.");
+                return false;
+            }
+            return true;
+        }
+    </script>
 </head>
 <body>
     <%- include('../header') %>
@@ -10,7 +43,8 @@
     <main>
         <div class="form-container">
             <h1>Create a Post</h1>
-            <form action="/create-post" method="POST">
+            <img id="previewImg">
+            <form action="/posts/create" method="POST" onsubmit="return validatePost(event)">
                 <div class="form-group">
                     <label for="title">Title <span class="required">*</span></label>
                     <input
@@ -24,14 +58,14 @@
 
                 <div class="form-group">
                     <label for="imageURL">Image URL</label>
-                    <input
+                    <input oninput="checkImgValidity(this.value)"
                         type="url"
                         id="imageURL"
                         name="imageURL"
                         placeholder="https://example.com/image.jpg"
                     />
                 </div>
-
+                <div id="imgErrorMsg">Invalid Image URL provided</div>
                 <div class="form-group">
                     <label for="description">Description</label>
                     <textarea

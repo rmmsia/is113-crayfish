@@ -9,7 +9,7 @@
     <nav class="site-nav">
         <a href="/home?sort=top">TOP</a>
         <a href="/home?sort=new">NEW</a>
-        <a href="/create-post" class="btn-submit">+ CREATE POST</a>
+        <a href="/posts/create" class="btn-submit">+ CREATE POST</a>
     </nav>
     <ol class="post-list">
         <% posts.forEach((post, i) => { %>
@@ -23,19 +23,19 @@
                 </div>
 
                 <% if (post.imageURL) { %>
-                    <a href="/post/<%= post.id %>" class="post-thumbnail-link">
+                    <a href="/posts/<%= post.id %>" class="post-thumbnail-link">
                         <img class="post-thumbnail" src="<%= post.imageURL %>" alt="<%= post.title %>" loading="lazy" />
                     </a>
                 <% } %>
 
                 <div class="post-body">
-                    <a href="/post/<%= post.id %>" class="post-title"><%= post.title %></a>
+                    <a href="/posts/<%= post.id %>" class="post-title"><%= post.title %></a>
                     <div class="post-sub">
                         <span class="author">@<%= post.author %></span>
                         <span class="dot">·</span>
                         <span class="time"><%= post.createdAt.toDateString() %></span>
                         <span class="dot">·</span>
-                        <a href="/post/<%= post.id %>#comments" class="comments-link"><%= post.comments.length %> comment<%= post.comments.length === 1 ? '' : 's' %></a>
+                        <a href="/posts/<%= post.id %>#comments" class="comments-link"><%= post.comments.length %> comment<%= post.comments.length === 1 ? '' : 's' %></a>
                     </div>
                 </div>
             </li>
