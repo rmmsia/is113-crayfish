@@ -261,3 +261,16 @@ body {
 .description {
   white-space: pre-line;
 }
+
+#previewImg {
+  display: none;
+  max-height: 25%;
+  max-width: 25%;
+}
+
+#imgErrorMsg {
+  display: none;
+  color: red;
+  font-style: italic;
+  font-size: small;
+}
