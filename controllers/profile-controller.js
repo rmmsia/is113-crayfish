@@ -4,9 +4,10 @@ exports.displayUserProfile = async (req , res) => {
   const user = req.user;
 
   try {
-    const { totalPosts, totalComments, totalKarma } = await profileService.getUserStats(user.username);
+    const { posts, totalPosts, totalComments, totalKarma } = await profileService.getUserStats(user.username);
 
     res.render("profile/profile", {
+      posts,
       user,
       totalKarma,
       totalPosts,
@@ -26,9 +27,10 @@ exports.visitOtherProfile = async (req, res) => {
   
   try{
     const user = await profileService.getUserByUsername(username);
-    const { totalPosts, totalComments, totalKarma } = await profileService.getUserStats(user.username);
+    const { posts, totalPosts, totalComments, totalKarma } = await profileService.getUserStats(user.username);
 
     res.render("profile/profile", {
+      posts,
       user,
       totalKarma,
       totalPosts,

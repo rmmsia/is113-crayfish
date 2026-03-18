@@ -20,6 +20,7 @@ exports.getUserStats = async (username) => {
   const totalKarma = posts.reduce((karma, post) => karma + ((post.upvotes - post.downvotes) || 0), 0);
 
   return {
+    posts,
     totalPosts,
     totalComments,
     totalKarma

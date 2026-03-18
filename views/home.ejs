@@ -7,9 +7,9 @@
 <body>
     <%- include('header') %>
     <nav class="site-nav">
+        <strong>SORT BY: </strong>
         <a href="/home?sort=top">TOP</a>
         <a href="/home?sort=new">NEW</a>
-        <a href="/posts/create" class="btn-submit">+ CREATE POST</a>
     </nav>
     <ol class="post-list">
         <% posts.forEach((post, i) => { %>
