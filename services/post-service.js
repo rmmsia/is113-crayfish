@@ -21,12 +21,88 @@ exports.createPost = async ({ title, imageURL, description, author }) => {
 		imageURL,
 		description,
 		author,
-		upvotes: 0,
-		downvotes: 0
+		upvotes: [],
+		downvotes: []
 	});
 
 	return post.save();
 };
+
+exports.upvotePost = async ({ userId, postId }) => {
+  const post = await Post.findById(postId);
+
+  if (!post) {
+		throw createServiceError('Post not found.', 404);
+	}
+  
+  //if post is already upvoted by user, remove the upvote
+  if (post.upvotes.includes(new mongoose.Types.ObjectId(userId))) {
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      { $pull: { upvotes: userId }},
+      { returnDocument: 'after' }
+    );
+
+    return updatedPost;
+  }
+
+  //if the user already downvoted the post, remove the downvote
+  if (post.downvotes.includes(new mongoose.Types.ObjectId(userId))) {
+    await Post.findByIdAndUpdate(
+      postId,
+      { $pull: { downvotes: userId }},
+      { returnDocument: 'after' }
+    );
+  }
+
+  //add the user's upvote
+  const updatedPost = await Post.findByIdAndUpdate(
+    postId,
+    { $push: { upvotes: userId }},
+    { returnDocument: 'after' }
+  );
+
+  //console.log(updatedPost);
+  return updatedPost;
+}
+
+exports.downvotePost = async({ userId, postId }) => {
+  const post = await Post.findById(postId);
+
+  if (!post) {
+    throw createServiceError('Post not found.', 404);
+  }
+
+  //if post is already downvoted by user, remove the downvote
+  if (post.downvotes.includes(new mongoose.Types.ObjectId(userId))) {
+    const updatedPost = await Post.findByIdAndUpdate(
+      postId,
+      { $pull: { downvotes: userId }},
+      { returnDocument: 'after' }
+    );
+
+    return updatedPost;
+  }
+
+  //if the post is already upvoted by user, remove upvote
+  if (post.upvotes.includes(new mongoose.Types.ObjectId(userId))) {
+    await Post.findByIdAndUpdate(
+      postId,
+      { $pull: { upvotes: userId }},
+      { returnDocument: 'after' }
+    );
+  }
+
+  //add the user's downvote
+  const updatedPost = await Post.findByIdAndUpdate(
+    postId,
+    { $push: { downvotes: userId }},
+    { returnDocument: 'after' }
+  );
+
+  //console.log(updatedPost);
+  return updatedPost;
+}
 
 exports.addCommentToPost = async ({ postId, commentText, author }) => {
 	if (!mongoose.isValidObjectId(postId)) {
@@ -44,7 +120,7 @@ exports.addCommentToPost = async ({ postId, commentText, author }) => {
 	await Post.findByIdAndUpdate(
 		postId,
 		{ $push: { comments: savedComment._id } },
-		{ new: true }
+		{ returnDocument: 'after' }
 	);
 
 	return savedComment;
