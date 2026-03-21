@@ -32,39 +32,32 @@ exports.upvotePost = async ({ userId, postId }) => {
   const post = await Post.findById(postId);
 
   if (!post) {
-		throw createServiceError('Post not found.', 404);
-	}
+    throw createServiceError('Post not found.', 404);
+  }
+
+  const userIdObj = new mongoose.Types.ObjectId(userId);
+  const isUpvoted = post.upvotes.includes(userIdObj);
+  const isDownvoted = post.downvotes.includes(userIdObj);
+
+  //when post is upvoted, remove the upvote
+  if (isUpvoted) {
+    return await Post.findByIdAndUpdate(
+      postId,
+      { $pull: { upvotes: userId } },
+      { returnDocument: 'after' }
+    );
+  }
+
+  //add upvote
+  const updateVote = { $push: { upvotes: userId } };
   
-  //if post is already upvoted by user, remove the upvote
-  if (post.upvotes.includes(new mongoose.Types.ObjectId(userId))) {
-    const updatedPost = await Post.findByIdAndUpdate(
-      postId,
-      { $pull: { upvotes: userId }},
-      { returnDocument: 'after' }
-    );
-
-    return updatedPost;
+  //if post is downvoted, remove the downvote 
+  if (isDownvoted) {
+    updateVote.$pull = { downvotes: userId };
   }
 
-  //if the user already downvoted the post, remove the downvote
-  if (post.downvotes.includes(new mongoose.Types.ObjectId(userId))) {
-    await Post.findByIdAndUpdate(
-      postId,
-      { $pull: { downvotes: userId }},
-      { returnDocument: 'after' }
-    );
-  }
-
-  //add the user's upvote
-  const updatedPost = await Post.findByIdAndUpdate(
-    postId,
-    { $push: { upvotes: userId }},
-    { returnDocument: 'after' }
-  );
-
-  //console.log(updatedPost);
-  return updatedPost;
-}
+  return await Post.findByIdAndUpdate(postId, updateVote, { returnDocument: 'after' });
+};
 
 exports.downvotePost = async({ userId, postId }) => {
   const post = await Post.findById(postId);
@@ -73,35 +66,28 @@ exports.downvotePost = async({ userId, postId }) => {
     throw createServiceError('Post not found.', 404);
   }
 
+  const userIdObj = new mongoose.Types.ObjectId(userId);
+  const isUpvoted = post.upvotes.includes(userIdObj);
+  const isDownvoted = post.downvotes.includes(userIdObj);
+
   //if post is already downvoted by user, remove the downvote
-  if (post.downvotes.includes(new mongoose.Types.ObjectId(userId))) {
-    const updatedPost = await Post.findByIdAndUpdate(
+  if (isDownvoted) {
+    return await Post.findByIdAndUpdate(
       postId,
-      { $pull: { downvotes: userId }},
-      { returnDocument: 'after' }
-    );
-
-    return updatedPost;
-  }
-
-  //if the post is already upvoted by user, remove upvote
-  if (post.upvotes.includes(new mongoose.Types.ObjectId(userId))) {
-    await Post.findByIdAndUpdate(
-      postId,
-      { $pull: { upvotes: userId }},
+      { $pull: { downvotes: userId } },
       { returnDocument: 'after' }
     );
   }
 
   //add the user's downvote
-  const updatedPost = await Post.findByIdAndUpdate(
-    postId,
-    { $push: { downvotes: userId }},
-    { returnDocument: 'after' }
-  );
+  const updateVote = { $push: { downvotes: userId } };
 
-  //console.log(updatedPost);
-  return updatedPost;
+  //if the post is already upvoted by user, remove upvote
+  if (isUpvoted) {
+    updateVote.$pull = { upvotes: userId };
+  }
+
+  return await Post.findByIdAndUpdate(postId, updateVote, { returnDocument: 'after' });
 }
 
 exports.addCommentToPost = async ({ postId, commentText, author }) => {
