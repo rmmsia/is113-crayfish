@@ -12,8 +12,9 @@ function sendError(res, err, context = null) {
 
 exports.displayPosts = async (req, res) => {
   try {
-    const posts = await postService.getAllPosts();
-    res.render('home', { posts });
+    const sort = req.query.sort || 'new';
+    const posts = await postService.getAllPosts(sort);
+    res.render('home', { posts, sort });
   } catch (err) {
     sendError(res, err, 'Error rendering /home:');
   }
