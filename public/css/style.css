@@ -48,8 +48,7 @@ body {
 .site-nav {
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding-top: 1em;
+  padding: 1.5em;
   gap: 1.5rem;
   font-size: 0.75rem;
   letter-spacing: 0.1em;
@@ -60,9 +59,8 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0;
-  padding: 1.5rem 1rem;
+  padding: 0 1rem;
   max-width: 900px;
-  margin: 0 auto;
   box-sizing: border-box;
 }
 .post-card {
@@ -85,7 +83,8 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  align-self: center;
+  gap: 5px;
 }
 
 .vote-btn {
@@ -123,8 +122,6 @@ body {
   width: 120px;
   height: 80px;
   object-fit: cover;
-  filter: grayscale(20%);
-  transition: filter 0.2s;
 }
 
 .post-thumbnail-link:hover .post-thumbnail { filter: grayscale(0%); }
@@ -135,6 +132,9 @@ body {
   font-size: 1.3rem;
   font-weight: 700;
   line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* prevents title from overflowing, appends ... to the end */
 }
 
 .post-sub {
@@ -260,6 +260,12 @@ body {
 
 .description {
   white-space: pre-line;
+}
+
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #previewImg {

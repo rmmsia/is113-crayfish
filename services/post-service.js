@@ -19,8 +19,8 @@ exports.getAllPosts = async (sort = 'new') => {
 	//Sort by upvotes
 	if (sort === 'top') {
 		return posts.sort((a, b) => {
-			const scoreA = a.upvotes - a.downvotes;
-			const scoreB = b.upvotes - b.downvotes;
+			const scoreA = a.upvotes.length - a.downvotes.length;
+			const scoreB = b.upvotes.length - b.downvotes.length;
 			return scoreB - scoreA;
 		});
 	}
@@ -45,12 +45,74 @@ exports.createPost = async ({ title, imageURL, description, author }) => {
 		imageURL,
 		description,
 		author,
-		upvotes: 0,
-		downvotes: 0
+		upvotes: [],
+		downvotes: []
 	});
 
 	return post.save();
 };
+
+exports.upvotePost = async ({ userId, postId }) => {
+  const post = await Post.findById(postId);
+
+  if (!post) {
+    throw createServiceError('Post not found.', 404);
+  }
+
+  const userIdObj = new mongoose.Types.ObjectId(userId);
+  const isUpvoted = post.upvotes.includes(userIdObj);
+  const isDownvoted = post.downvotes.includes(userIdObj);
+
+  //when post is upvoted, remove the upvote
+  if (isUpvoted) {
+    return await Post.findByIdAndUpdate(
+      postId,
+      { $pull: { upvotes: userId } },
+      { returnDocument: 'after' }
+    );
+  }
+
+  //add upvote
+  const updateVote = { $push: { upvotes: userId } };
+  
+  //if post is downvoted, remove the downvote 
+  if (isDownvoted) {
+    updateVote.$pull = { downvotes: userId };
+  }
+
+  return await Post.findByIdAndUpdate(postId, updateVote, { returnDocument: 'after' });
+};
+
+exports.downvotePost = async({ userId, postId }) => {
+  const post = await Post.findById(postId);
+
+  if (!post) {
+    throw createServiceError('Post not found.', 404);
+  }
+
+  const userIdObj = new mongoose.Types.ObjectId(userId);
+  const isUpvoted = post.upvotes.includes(userIdObj);
+  const isDownvoted = post.downvotes.includes(userIdObj);
+
+  //if post is already downvoted by user, remove the downvote
+  if (isDownvoted) {
+    return await Post.findByIdAndUpdate(
+      postId,
+      { $pull: { downvotes: userId } },
+      { returnDocument: 'after' }
+    );
+  }
+
+  //add the user's downvote
+  const updateVote = { $push: { downvotes: userId } };
+
+  //if the post is already upvoted by user, remove upvote
+  if (isUpvoted) {
+    updateVote.$pull = { upvotes: userId };
+  }
+
+  return await Post.findByIdAndUpdate(postId, updateVote, { returnDocument: 'after' });
+}
 
 exports.addCommentToPost = async ({ postId, commentText, author }) => {
 	if (!mongoose.isValidObjectId(postId)) {
@@ -68,7 +130,7 @@ exports.addCommentToPost = async ({ postId, commentText, author }) => {
 	await Post.findByIdAndUpdate(
 		postId,
 		{ $push: { comments: savedComment._id } },
-		{ new: true }
+		{ returnDocument: 'after' }
 	);
 
 	return savedComment;
