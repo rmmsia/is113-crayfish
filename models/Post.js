@@ -5,8 +5,8 @@ const postSchema = new mongoose.Schema({
     imageURL: {type: String},
     description: {type: String},
     author: {type: String},
-    upvotes: {type: Number},
-    downvotes: {type: Number},
+    upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }]
 }, { timestamps: true });
 

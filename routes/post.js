@@ -7,7 +7,9 @@ const {
   deleteComment,
   editComment,
   displayPost,
-  displayCreatePost
+  displayCreatePost,
+  upvotePost,
+  downvotePost
 } = require('../controllers/post-controller');
 
 
@@ -24,5 +26,9 @@ router.post('/:postId/:commentId/delete', deleteComment);
 router.post('/:postId/:commentId/edit', editComment);
 
 router.get('/:id', displayPost);
+
+router.post('/:id/upvote', upvotePost);
+
+router.post('/:id/downvote', downvotePost);
 
 module.exports = router;
