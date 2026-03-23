@@ -109,3 +109,36 @@ exports.displayPost = async (req, res) => {
     sendError(res, err, 'Error displaying post:');
   }
 };
+
+exports.editPost = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, imageURL, description } = req.body;
+        const username = req.user.username;
+
+        await postService.updatePost({
+            postId: id,
+            title,
+            imageURL,
+            description,
+            username
+        });
+
+        res.redirect(`/posts/${id}`);
+    } catch (err) {
+        sendError(res, err, 'Error updating post:');
+    }
+};
+
+exports.deletePost = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const username = req.user.username;
+
+        await postService.deletePost({ postId: id, username });
+
+        res.redirect('/posts');
+    } catch (err) {
+        sendError(res, err, 'Error deleting post:');
+    }
+};

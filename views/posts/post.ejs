@@ -49,6 +49,18 @@
           <span class="dot">·</span>
           <span class="time"><%= post.createdAt.toLocaleDateString() %></span>
         </div>
+        <% if (user===post.author) { %>
+          <div class="post-owner-controls" style="display: inline-flex; gap: 10px; margin-left: 15px;">
+        
+            <form action="/posts/<%= post._id %>/delete" method="POST"
+              onsubmit="return confirm('Are you sure you want to delete this entire post?');" style="display:inline;">
+              <button type="submit" class="btn-delete-link">Delete</button>
+            </form>
+            <span class="dot">·</span>
+            <a href="/posts/<%= post._id %>/edit" style="text-decoration: none; font-size: 0.9em;">Edit Post</a>
+        
+          </div>
+          <% } %>
         <hr style="background-color:grey; width: 100%;">
         <h3 id="comments"><%= post.comments.length %> comment<%= post.comments.length === 1 ? '' : 's' %></h3>
         <form action="/posts/<%= post._id %>/add-comment" method="post">

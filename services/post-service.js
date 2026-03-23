@@ -109,3 +109,31 @@ exports.getPostByIdWithComments = async ({ postId }) => {
 
 	return post;
 };
+
+exports.updatePost = async ({ postId, title, imageURL, description, username }) => {
+    const post = await Post.findById(postId);
+    if (!post) throw createServiceError('Post not found', 404);
+    
+    if (post.author !== username) {
+        throw createServiceError('Unauthorized to edit this post', 403);
+    }
+
+    post.title = title;
+    post.imageURL = imageURL;
+    post.description = description;
+    
+    return await post.save();
+};
+
+exports.deletePost = async ({ postId, username }) => {
+    const post = await Post.findById(postId);
+    if (!post) throw createServiceError('Post not found', 404);
+
+    if (post.author !== username) {
+        throw createServiceError('Unauthorized to delete this post', 403);
+    }
+
+    await Comment.deleteMany({ _id: { $in: post.comments } });
+    
+    return await Post.findByIdAndDelete(postId);
+};
