@@ -9,7 +9,9 @@ const {
   displayPost,
   displayCreatePost,
   editPost,
-  deletePost
+  deletePost,
+  displayEditPost,
+  updatePost
 } = require('../controllers/post-controller');
 
 
@@ -28,6 +30,8 @@ router.post('/:postId/:commentId/edit', editComment);
 router.get('/:id', displayPost);
 
 router.post('/:id/edit', editPost);
+
+router.get('/:id/edit', displayEditPost);
 
 router.post('/:id/delete', deletePost);
 

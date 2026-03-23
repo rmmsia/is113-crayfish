@@ -142,3 +142,14 @@ exports.deletePost = async (req, res) => {
         sendError(res, err, 'Error deleting post:');
     }
 };
+
+exports.displayEditPost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const post = await postService.getPostByIdWithComments({ postId: id });
+
+    res.render('posts/edit-post', { post }); 
+  } catch (err) {
+    sendError(res, err, 'Error displaying edit page:');
+  }
+};

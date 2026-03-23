@@ -274,3 +274,32 @@ body {
   font-style: italic;
   font-size: small;
 }
+
+.post-owner-controls {
+    display: inline-flex;
+    gap: 10px;
+    margin-left: 15px;
+    align-items: center;
+}
+
+.post-ctrl-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: #666;
+    font-size: 0.9em;
+    font-family: inherit;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+.post-ctrl-btn:hover {
+    color: #000; 
+    text-decoration: underline;
+}
+
+button.post-ctrl-btn:hover {
+    color: #d9534f; 
+}
