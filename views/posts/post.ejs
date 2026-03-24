@@ -1,31 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <% if (post) { %>
-    <title>Crayfish: Post - <%= post.title %></title>
-  <% } %>
-  <link rel="stylesheet" href="/css/style.css" />
-  <script>
-    function toggleEdit(commentId) {
-      const comment = document.getElementById(`comment-${commentId}`);
-      const comment_edit = document.getElementById(`edit-${commentId}`);
-      const actionButtons = document.getElementById(`buttons-${commentId}`);
-      if (comment_edit.style.display === 'none') {
-        comment_edit.style.display = 'block';
-        comment.style.display = 'none';
-        actionButtons.style.display = 'none';
-      } else {
-        comment.style.display = 'block';
-        actionButtons.style.display = 'flex';
-        comment_edit.style.display = 'none';
-      }
-    }
-  </script>
+    <title>Crayfish: Post - <%= post.title %>
+    </title>
+    <% } %>
+      <link rel="stylesheet" href="/css/style.css" />
+      <script>
+        function toggleEdit(commentId) {
+          const comment = document.getElementById(`comment-${commentId}`);
+          const comment_edit = document.getElementById(`edit-${commentId}`);
+          const actionButtons = document.getElementById(`buttons-${commentId}`);
+          if (comment_edit.style.display === 'none') {
+            comment_edit.style.display = 'block';
+            comment.style.display = 'none';
+            actionButtons.style.display = 'none';
+          } else {
+            comment.style.display = 'block';
+            actionButtons.style.display = 'flex';
+            comment_edit.style.display = 'none';
+          }
+        }
+      </script>
 </head>
 
 <body>
   <%- include('../header') %>
-  <main class="post-page">
+    <main class="post-page">
       <div class="post-head">
         <div class="voting-col">
           <form action="/posts/<%= post.id %>/upvote" method="post">
@@ -38,54 +40,85 @@
             <button class="down vote-btn" data-id="<%= post.id %>" data-dir="down" title="downvote">▼</button>
           </form>
         </div>
-        <h2 style="padding-left: 10px;"><%= post.title %></h2>
+        <h2 style="padding-left: 10px;">
+          <%= post.title %>
+        </h2>
       </div>
-      
+
       <% if (post.imageURL) { %>
         <a href="/posts/<%= post.id %>">
           <img class="post-img-expanded" src="<%= post.imageURL %>" alt="<%= post.title %>" loading="lazy" />
         </a>
-      <% } %>
+        <% } %>
 
-      <div class="post-body">
-        <span class="description"><%= post.description %></span>
-        <br />
-        <div class="post-sub">
-          <span class="author">By <a href="/profile/u/<%= post.author %>" class="author">@<%= post.author %></a></span>
-          <span class="dot">·</span>
-          <span class="time"><%= post.createdAt.toLocaleDateString() %></span>
-        </div>
-        <hr style="background-color:grey; width: 100%;">
-        <h3 id="comments"><%= post.comments.length %> comment<%= post.comments.length === 1 ? '' : 's' %></h3>
-        <form action="/posts/<%= post._id %>/add-comment" method="post">
-          <textarea name="add_comment" id="add_comment" rows="5" style="width:100%" placeholder="Write a Comment here..." required></textarea><br />
-          <button type="submit">Post</button>
-        </form>
-        <% post.comments.reverse().forEach(item => { %>
-          <div class="comment-container">
-            <form id="edit-<%= item._id %>" action="/posts/<%= post._id %>/<%= item._id %>/edit" method="post" style="display: none; margin-left: 15px;">
-              <textarea name="updated_comment" rows="3" style="width: 100%;" required><%= item.text %></textarea>
-              <div>
-                <button type="submit">Save</button>
-                <button type="button" onclick="toggleEdit('<%= item._id %>')">Cancel</button>
-              </div>
-            </form>
-            <div class="comment-field" id="comment-<%= item._id %>">
-              <span style="font-weight: 600;">@<%= item.author %>:</span><br />
-              <span class="comment-text"><%= item.text %></span><br />
-              <span class="comment-date">Posted on <%= item.createdAt.toLocaleString() %> <%= item.createdAt.getTime() === item.updatedAt.getTime() ? '' : '(Edited: ' + item.updatedAt.toLocaleString() + ')' %></span>
+          <div class="post-body">
+            <span class="description">
+              <%= post.description %>
+            </span>
+            <br />
+            <div class="post-sub">
+              <span class="author">By <a href="/profile/u/<%= post.author %>" class="author">@<%= post.author %>
+                    </a></span>
+              <span class="dot">·</span>
+              <span class="time">
+                <%= post.createdAt.toLocaleDateString() %>
+              </span>
             </div>
-            <% if (user === item.author) { %>
-              <div class="comment-buttons" id="buttons-<%= item._id %>">
-                <button type="submit" onclick="toggleEdit('<%= item._id %>')">Edit</button>
-                <form action="/posts/<%= post._id %>/<%= item._id %>/delete" method="post" onsubmit="return confirm('Are you sure you want to delete this comment?');">
-                  <button type="submit">Delete</button>
+            <% if (user===post.author) { %>
+              <div class="post-owner-controls">
+                <form action="/posts/<%= post._id %>/delete" method="POST"
+                  onsubmit="return confirm('Are you sure you want to delete this entire post?');"
+                  style="display:inline;">
+                  <button type="submit" class="post-ctrl-btn">Delete</button>
                 </form>
+
+                <span class="dot">·</span>
+
+                <a href="/posts/<%= post._id %>/edit" class="post-ctrl-btn">Edit Post</a>
               </div>
-            <% } %>
+              <% } %>
+                <hr style="background-color:grey; width: 100%;">
+                <h3 id="comments">
+                  <%= post.comments.length %> comment<%= post.comments.length===1 ? '' : 's' %>
+                </h3>
+                <form action="/posts/<%= post._id %>/add-comment" method="post">
+                  <textarea name="add_comment" id="add_comment" rows="5" style="width:100%"
+                    placeholder="Write a Comment here..." required></textarea><br />
+                  <button type="submit">Post</button>
+                </form>
+                <% post.comments.reverse().forEach(item=> { %>
+                  <div class="comment-container">
+                    <form id="edit-<%= item._id %>" action="/posts/<%= post._id %>/<%= item._id %>/edit" method="post"
+                      style="display: none; margin-left: 15px;">
+                      <textarea name="updated_comment" rows="3" style="width: 100%;"
+                        required><%= item.text %></textarea>
+                      <div>
+                        <button type="submit">Save</button>
+                        <button type="button" onclick="toggleEdit('<%= item._id %>')">Cancel</button>
+                      </div>
+                    </form>
+                    <div class="comment-field" id="comment-<%= item._id %>">
+                      <span style="font-weight: 600;">@<%= item.author %>:</span><br />
+                      <span class="comment-text">
+                        <%= item.text %>
+                      </span><br />
+                      <span class="comment-date">Posted on <%= item.createdAt.toLocaleString() %>
+                          <%= item.createdAt.getTime()===item.updatedAt.getTime() ? '' : '(Edited: ' +
+                            item.updatedAt.toLocaleString() + ')' %></span>
+                    </div>
+                    <% if (user===item.author) { %>
+                      <div class="comment-buttons" id="buttons-<%= item._id %>">
+                        <button type="submit" onclick="toggleEdit('<%= item._id %>')">Edit</button>
+                        <form action="/posts/<%= post._id %>/<%= item._id %>/delete" method="post"
+                          onsubmit="return confirm('Are you sure you want to delete this comment?');">
+                          <button type="submit">Delete</button>
+                        </form>
+                      </div>
+                      <% } %>
+                  </div>
+                  <% }) %>
           </div>
-        <% }) %>
-      </div>
     </main>
 </body>
+
 </html>

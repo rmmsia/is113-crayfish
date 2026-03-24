@@ -8,6 +8,10 @@ const {
   editComment,
   displayPost,
   displayCreatePost,
+  editPost,
+  deletePost,
+  displayEditPost,
+  updatePost
   upvotePost,
   downvotePost
 } = require('../controllers/post-controller');
@@ -27,6 +31,11 @@ router.post('/:postId/:commentId/edit', editComment);
 
 router.get('/:id', displayPost);
 
+router.post('/:id/edit', editPost);
+
+router.get('/:id/edit', displayEditPost);
+
+router.post('/:id/delete', deletePost);
 router.post('/:id/upvote', upvotePost);
 
 router.post('/:id/downvote', downvotePost);
