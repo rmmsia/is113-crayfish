@@ -19,6 +19,34 @@ exports.displayPosts = async (req, res) => {
   }
 };
 
+exports.upvotePost = async (req, res) => {
+  const { id } = req.params;
+  const { route } = req.body;
+  const userId = req.user._id;
+
+  try {
+    await postService.upvotePost({ userId, postId: id });
+
+    res.redirect(route);
+  } catch (err) {
+    sendError(res, err)
+  }
+}
+
+exports.downvotePost = async (req, res) => {
+  const { id } = req.params;
+  const { route } = req.body;
+  const userId = req.user._id;
+
+  try {
+    await postService.downvotePost({ userId, postId: id });
+
+    res.redirect(route);
+  } catch (err) {
+    sendError(res,err)
+  }
+}
+
 exports.displayCreatePost = (req, res) => {
   res.render('posts/create-post');
 };

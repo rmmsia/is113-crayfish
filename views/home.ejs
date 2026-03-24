@@ -7,9 +7,9 @@
 <body>
     <%- include('header') %>
     <nav class="site-nav">
+        <strong>SORT BY: </strong>
         <a href="/home?sort=top">TOP</a>
         <a href="/home?sort=new">NEW</a>
-        <a href="/posts/create" class="btn-submit">+ CREATE POST</a>
     </nav>
     <ol class="post-list">
         <% posts.forEach((post, i) => { %>
@@ -17,9 +17,15 @@
                 <div class="rank"># <%= i + 1 < 10 ? '0' : '' %><%= i + 1 %></div>
 
                 <div class="voting-col">
-                    <button class="up vote-btn" data-id="<%= post.id %>" data-dir="up" title="upvote">▲</button>
-                    <span class="score" data-id="<%= post.id %>"><%= post.upvotes - post.downvotes %></span>
-                    <button class="down vote-btn" data-id="<%= post.id %>" data-dir="down" title="downvote">▼</button>
+                    <form action="/posts/<%= post.id %>/upvote" method="post">
+                      <input type="hidden" value="/posts" name="route">
+                      <button type="submit" class="up vote-btn" data-id="<%= post.id %>" data-dir="up" title="upvote">▲</button>
+                    </form>
+                    <span class="score" data-id="<%= post.id %>"><%= post.upvotes?.length - post.downvotes?.length %></span>
+                    <form action="/posts/<%= post.id %>/downvote" method="post">
+                      <input type="hidden" value="/posts" name="route">
+                      <button type="submit" class="down vote-btn" data-id="<%= post.id %>" data-dir="down" title="downvote">▼</button>
+                    </form>
                 </div>
 
                 <% if (post.imageURL) { %>

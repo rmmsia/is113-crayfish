@@ -12,6 +12,8 @@ const {
   deletePost,
   displayEditPost,
   updatePost
+  upvotePost,
+  downvotePost
 } = require('../controllers/post-controller');
 
 
@@ -34,5 +36,8 @@ router.post('/:id/edit', editPost);
 router.get('/:id/edit', displayEditPost);
 
 router.post('/:id/delete', deletePost);
+router.post('/:id/upvote', upvotePost);
+
+router.post('/:id/downvote', downvotePost);
 
 module.exports = router;
