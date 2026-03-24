@@ -14,7 +14,8 @@ exports.displayPosts = async (req, res) => {
   try {
     const sort = req.query.sort || 'new';
     const posts = await postService.getAllPosts(sort);
-    res.render('home', { posts, sort });
+    const userId = req.user._id;
+    res.render('home', { posts, sort, userId });
   } catch (err) {
     sendError(res, err, 'Error rendering /home:');
   }
@@ -127,12 +128,14 @@ exports.displayPost = async (req, res) => {
   try {
     const { id } = req.params;
     const user = req.user.username;
+    const userId = req.user._id;
 
     const post = await postService.getPostByIdWithComments({ postId: id });
 
     res.render('posts/post', {
       post,
-      user
+      user,
+      userId
     });
   } catch (err) {
     sendError(res, err, 'Error displaying post:');
