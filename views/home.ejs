@@ -7,9 +7,11 @@
 <body>
     <%- include('header') %>
     <nav class="site-nav">
-        <strong>SORT BY: </strong>
-        <a href="/home?sort=top">TOP</a>
-        <a href="/home?sort=new">NEW</a>
+        <a href="/posts?sort=top" class="<%= sort === 'top' ? 'active' : '' %>">TOP</a>
+        <a href="/posts?sort=new" class="<%= sort === 'new' ? 'active' : '' %>">NEW</a>
+        <a href="/posts?sort=author_asc" class="<%= sort === 'author_asc' ? 'active' : '' %>">AUTHOR A-Z</a>
+        <a href="/posts?sort=author_desc" class="<%= sort === 'author_desc' ? 'active' : '' %>">AUTHOR Z-A</a>
+        <a href="/posts/create" class="btn-submit">+ CREATE POST</a>
     </nav>
     <ol class="post-list">
         <% posts.forEach((post, i) => { %>

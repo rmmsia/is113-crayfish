@@ -13,7 +13,31 @@ function createServiceError(message, status = 500, code = null) {
 	return error;
 }
 
-exports.getAllPosts = async () => Post.find().sort({ createdAt: -1 });
+exports.getAllPosts = async (sort = 'new') => {
+	const posts = await Post.find();
+
+	//Sort by upvotes
+	if (sort === 'top') {
+		return posts.sort((a, b) => {
+			const scoreA = a.upvotes.length - a.downvotes.length;
+			const scoreB = b.upvotes.length - b.downvotes.length;
+			return scoreB - scoreA;
+		});
+	}
+
+	//sort by alphabetical order 
+	// A-Z
+	if (sort === 'author_asc') {
+		return posts.sort((a, b) => a.author.localeCompare(b.author));
+	}
+	// Z-A
+	if (sort === 'author_desc') {
+		return posts.sort((a, b) => b.author.localeCompare(a.author));
+	}
+
+	// default shows latest
+	return posts.sort((a, b) => b.createdAt - a.createdAt);
+};
 
 exports.createPost = async ({ title, imageURL, description, author }) => {
 	const post = new Post({
