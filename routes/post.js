@@ -11,7 +11,7 @@ const {
   editPost,
   deletePost,
   displayEditPost,
-  updatePost
+  updatePost,
   upvotePost,
   downvotePost
 } = require('../controllers/post-controller');
