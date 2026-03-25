@@ -1,5 +1,15 @@
 const inviteService = require('../services/invite-service');
 
+function sendError(res, err, context = null) {
+  const status = err.status || 500;
+
+  if (status >= 500 && context) {
+    console.error(context, err);
+  }
+
+  res.status(status).send(context + err.message);
+}
+
 exports.displayInvitePage = async (req, res) => {
   try {
     const inviteList = await inviteService.getInvitesByCreator(req.user.username);
@@ -11,8 +21,7 @@ exports.displayInvitePage = async (req, res) => {
       inviteList
     });
   } catch (err) {
-    console.error(err);
-    res.status(500).send('Error reading database');
+    sendError(res, err, 'Error retrieving invites: ')
   }
 };
 
@@ -42,6 +51,6 @@ exports.generateInvitation = async (req, res) => {
       });
     }
 
-    res.status(err.status || 500).send('Error sending invite: ' + err.message);
+    sendError(res, err, 'Error generating invite: ');
   }
 };

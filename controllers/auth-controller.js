@@ -1,25 +1,35 @@
 const authService = require("../services/auth-service");
 
-exports.displayRegister = (req, res) => {
+function sendError(res, err, context = null) {
+  const status = err.status || 500;
+
+  if (status >= 500 && context) {
+    console.error(context, err);
+  }
+
+  res.status(status).send(context + err.message);
+}
+
+exports.registerGet = (req, res) => {
   res.render("auth/register");
 };
 
-exports.submitRegister = async (req, res) => {
+exports.registerPost = async (req, res) => {
   const { username, email, password, inviter, vcode } = req.body;
 
   try {
     await authService.registerUser({ username, email, password, inviter, vcode });
     res.redirect("/login");
   } catch (err) {
-    res.status(400).send(err.message);
+    sendError(res, err, 'Error registering user: ')
   }
 };
 
-exports.displayLogin = (req, res) => {
+exports.loginGet = (req, res) => {
   res.render("auth/login", { error: null });
 };
 
-exports.submitLogin = async (req, res) => {
+exports.loginPost = async (req, res) => {
   const { username, password } = req.body;
   
   try {
@@ -36,7 +46,7 @@ exports.submitLogin = async (req, res) => {
 exports.processLogout = (req, res) => {
   req.session.destroy((err) => {
     if (err) {
-      return res.status(500).send("Could not log out. Please try again.");
+      return sendError(res, err, 'Could not log out. Please try again.');
     }
     res.clearCookie("connect.sid");
     res.redirect("/login");
