@@ -196,7 +196,7 @@ exports.getPostByIdWithComments = async ({ postId }) => {
 	return post;
 };
 
-exports.updatePost = async ({ postId, title, imageURL, description, username }) => {
+exports.updatePost = async ({ postId, title, imageURL, description, username, tags }) => {
     const post = await Post.findById(postId);
     if (!post) throw createServiceError('Post not found', 404);
     
@@ -207,6 +207,7 @@ exports.updatePost = async ({ postId, title, imageURL, description, username }) 
     post.title = title;
     post.imageURL = imageURL;
     post.description = description;
+	post.tags = tags || [];
     
     return await post.save();
 };
@@ -222,4 +223,22 @@ exports.deletePost = async ({ postId, username }) => {
     await Comment.deleteMany({ _id: { $in: post.comments } });
     
     return await Post.findByIdAndDelete(postId);
+};
+
+exports.createPost = async ({ title, imageURL, description, author, tags }) => {
+    return await Post.create({
+        title,
+        imageURL,
+        description,
+        author,
+        tags: tags || []
+    });
+};
+
+exports.updatePostInDB = async (postId, { title, imageURL, description, tags }, username) => {
+    post.title = title;
+    post.imageURL = imageURL;
+    post.description = description;
+    post.tags = tags || [];
+    return await post.save();
 };

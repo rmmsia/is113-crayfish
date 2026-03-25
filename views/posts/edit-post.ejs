@@ -24,6 +24,21 @@
             <textarea id="description" name="description" rows="5" placeholder="What's on your mind?"><%= post.description %></textarea>
         </div>
 
+        <div class="form-group">
+            <label>Tags</label>
+            <div class="tags-container">
+                <% const availableTags=['News', 'Photography' , 'Help' , 'Question' , 'Discussion' ]; %>
+                    <% availableTags.forEach(tag=> { %>
+                        <div class="tag-checkbox">
+                            <input type="checkbox" id="tag-<%= tag %>" name="tags" value="<%= tag %>">
+                            <label for="tag-<%= tag %>">
+                                <%= tag %>
+                            </label>
+                        </div>
+                        <% }) %>
+            </div>
+        </div>
+
         <div class="form-row">
             <button type="submit">Update Post</button>
         </div>

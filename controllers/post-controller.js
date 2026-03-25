@@ -55,13 +55,16 @@ exports.displayCreatePost = (req, res) => {
 
 exports.createPost = async (req, res) => {
   try {
-    const { title, imageURL, description } = req.body;
+    const { title, imageURL, description, tags } = req.body;
+
+    const tagsArray = tags ? [].concat(tags) : [];
 
     await postService.createPost({
       title,
       imageURL,
       description,
-      author: req.user.username
+      author: req.user.username,
+      tags: tagsArray
     });
 
     res.redirect('/posts');
@@ -145,15 +148,18 @@ exports.displayPost = async (req, res) => {
 exports.editPost = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, imageURL, description } = req.body;
+        const { title, imageURL, description,tags } = req.body;
         const username = req.user.username;
+
+        const tagsArray = tags ? [].concat(tags) : [];
 
         await postService.updatePost({
             postId: id,
             title,
             imageURL,
             description,
-            username
+            username,
+            tags: tagsArray
         });
 
         res.redirect(`/posts/${id}`);

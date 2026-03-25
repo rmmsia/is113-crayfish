@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <title>Crayfish: Create Post</title>
     <link rel="stylesheet" href="/css/style.css" />
@@ -10,12 +11,12 @@
             if (imgURL) {
                 const img = new Image(imgURL);
                 img.src = imgURL;
-                img.onerror = function() {
+                img.onerror = function () {
                     document.getElementById("imgErrorMsg").style.display = "block";
                     document.getElementById("previewImg").style.display = "none";
                     isValid = false;
                 }
-                img.onload = function() {
+                img.onload = function () {
                     document.getElementById("imgErrorMsg").style.display = "none";
                     document.getElementById("previewImg").src = imgURL;
                     document.getElementById("previewImg").style.display = "block";
@@ -27,7 +28,7 @@
                 isValid = true;
             }
         }
-        
+
         function validatePost(event) {
             if (!isValid) {
                 alert("The Image URL provided is invalid. Please change or remove it.");
@@ -37,48 +38,50 @@
         }
     </script>
 </head>
+
 <body>
     <%- include('../header') %>
 
-    <main>
-        <div class="form-container">
-            <h1>Create a Post</h1>
-            <img id="previewImg">
-            <form action="/posts/create" method="POST" onsubmit="return validatePost(event)">
-                <div class="form-group">
-                    <label for="title">Title <span class="required">*</span></label>
-                    <input
-                        type="text"
-                        id="title"
-                        name="title"
-                        placeholder="Enter a title"
-                        required
-                    />
-                </div>
+        <main>
+            <div class="form-container">
+                <h1>Create a Post</h1>
+                <img id="previewImg">
+                <form action="/posts/create" method="POST" onsubmit="return validatePost(event)">
+                    <div class="form-group">
+                        <label for="title">Title <span class="required">*</span></label>
+                        <input type="text" id="title" name="title" placeholder="Enter a title" required />
+                    </div>
 
-                <div class="form-group">
-                    <label for="imageURL">Image URL</label>
-                    <input oninput="checkImgValidity(this.value)"
-                        type="url"
-                        id="imageURL"
-                        name="imageURL"
-                        placeholder="https://example.com/image.jpg"
-                    />
-                </div>
-                <div id="imgErrorMsg">Invalid Image URL provided</div>
-                <div class="form-group">
-                    <label for="description">Description</label>
-                    <textarea
-                        id="description"
-                        name="description"
-                        placeholder="What's on your mind?"
-                        rows="5"
-                    ></textarea>
-                </div>
+                    <div class="form-group">
+                        <label for="imageURL">Image URL</label>
+                        <input oninput="checkImgValidity(this.value)" type="url" id="imageURL" name="imageURL"
+                            placeholder="https://example.com/image.jpg" />
+                    </div>
+                    <div id="imgErrorMsg">Invalid Image URL provided</div>
+                    <div class="form-group">
+                        <label for="description">Description</label>
+                        <textarea id="description" name="description" placeholder="What's on your mind?"
+                            rows="5"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Tags</label>
+                        <div class="tags-container">
+                            <% const availableTags=['News', 'Photography' , 'Help' , 'Question' , 'Discussion' ]; %>
+                                <% availableTags.forEach(tag=> { %>
+                                    <div class="tag-checkbox">
+                                        <input type="checkbox" id="tag-<%= tag %>" name="tags" value="<%= tag %>">
+                                        <label for="tag-<%= tag %>">
+                                            <%= tag %>
+                                        </label>
+                                    </div>
+                                    <% }) %>
+                        </div>
+                    </div>
 
-                <button type="submit">Post</button>
-            </form>
-        </div>
-    </main>
+                    <button type="submit">Post</button>
+                </form>
+            </div>
+        </main>
 </body>
+
 </html>

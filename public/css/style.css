@@ -310,3 +310,33 @@ body {
 button.post-ctrl-btn:hover {
     color: #d9534f; 
 }
+
+.tags-checkbox-group {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+    width: 300px;
+}
+
+.tag-label {
+    font-size: 0.9em;
+    font-weight: normal !important;
+    cursor: pointer;
+}
+
+.post-tags-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.tag-item {
+    color: #007bff; /* A nice link blue */
+    font-size: 0.9em;
+    font-weight: 500;
+    background-color: #f0f7ff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    border: 1px solid #cce5ff;
+}
