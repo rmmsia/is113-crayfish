@@ -11,7 +11,6 @@
         <a href="/posts?sort=new" class="<%= sort === 'new' ? 'active' : '' %>">NEW</a>
         <a href="/posts?sort=author_asc" class="<%= sort === 'author_asc' ? 'active' : '' %>">AUTHOR A-Z</a>
         <a href="/posts?sort=author_desc" class="<%= sort === 'author_desc' ? 'active' : '' %>">AUTHOR Z-A</a>
-        <a href="/posts/create" class="btn-submit">+ CREATE POST</a>
     </nav>
     <ol class="post-list">
         <% posts.forEach((post, i) => { %>
@@ -21,12 +20,12 @@
                 <div class="voting-col">
                     <form action="/posts/<%= post.id %>/upvote" method="post">
                       <input type="hidden" value="/posts" name="route">
-                      <button type="submit" class="up vote-btn" data-id="<%= post.id %>" data-dir="up" title="upvote">▲</button>
+                      <button type="submit" class="up vote-btn <%= (post.upvotes || []).includes(userId) ? 'voted-up' : '' %>" title="upvote">▲</button>
                     </form>
                     <span class="score" data-id="<%= post.id %>"><%= post.upvotes?.length - post.downvotes?.length %></span>
                     <form action="/posts/<%= post.id %>/downvote" method="post">
                       <input type="hidden" value="/posts" name="route">
-                      <button type="submit" class="down vote-btn" data-id="<%= post.id %>" data-dir="down" title="downvote">▼</button>
+                      <button type="submit" class="down vote-btn <%= (post.downvotes || []).includes(userId) ? 'voted-down' : '' %>" title="downvote">▼</button>
                     </form>
                 </div>
 
@@ -39,7 +38,9 @@
                 <div class="post-body">
                     <a href="/posts/<%= post.id %>" class="post-title"><%= post.title %></a>
                     <div class="post-sub">
-                        <span class="author">@<%= post.author %></span>
+                        <span>
+                            <a href="/profile/u/<%= post.author %>" class="author">@<%= post.author %></a>
+                        </span>
                         <span class="dot">·</span>
                         <span class="time"><%= post.createdAt.toDateString() %></span>
                         <span class="dot">·</span>
