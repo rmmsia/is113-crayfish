@@ -1,5 +1,15 @@
 const profileService = require('../services/profile-service');
 
+function sendError(res, err, context = null) {
+  const status = err.status || 500;
+
+  if (status >= 500 && context) {
+    console.error(context, err);
+  }
+
+  res.status(status).send(context + err.message);
+}
+
 exports.displayUserProfile = async (req , res) => {
   const user = req.user;
 
@@ -15,8 +25,7 @@ exports.displayUserProfile = async (req , res) => {
       isUser: true
     });
   } catch (err) {
-    console.error('Error retrieving profile: ' + err);
-    res.status(err.status || 500).send(err.message);
+    sendError(res, err, 'Error retrieving profile: ');
   }
 }
 
@@ -38,8 +47,7 @@ exports.visitOtherProfile = async (req, res) => {
       isUser: false
     });
   } catch (err) {
-    console.error('Error retrieving profile: ' + err);
-    res.status(err.status || 500).send(err.message);
+    sendError(res, err, 'Error retrieving profile: ');
   }
 }
 
@@ -60,7 +68,6 @@ exports.submitUpdateProfile = async (req, res) => {
 
     res.redirect('/profile');
   } catch (err) {
-    console.error('Error updating profile: ' + err);
-    res.status(err.status || 500).send(err.message);
+    sendError(res, err, 'Error updating profile: ');
   }
 }

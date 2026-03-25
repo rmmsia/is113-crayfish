@@ -7,7 +7,7 @@ function sendError(res, err, context = null) {
     console.error(context, err);
   }
 
-  res.status(status).send(err.message);
+  res.status(status).send(context + err.message);
 }
 
 exports.displayPosts = async (req, res) => {

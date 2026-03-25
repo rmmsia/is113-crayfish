@@ -1,20 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const {
-  displayRegister,
   processLogout,
-  submitRegister,
-  displayLogin,
-  submitLogin,
+  registerGet,
+  registerPost,
+  loginPost,
+  loginGet,
 } = require("../controllers/auth-controller");
 
-router.get("/register", displayRegister);
+router.get("/register", registerGet);
 
-router.post("/register", submitRegister);
+router.post("/register", registerPost);
 
-router.get("/login", displayLogin);
+router.get("/login", loginGet);
 
-router.post("/login", submitLogin);
+router.post("/login", loginPost);
 
 router.get("/logout", processLogout);
 
