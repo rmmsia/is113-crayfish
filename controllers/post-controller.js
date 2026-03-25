@@ -1,0 +1,187 @@
+const postService = require('../services/post-service');
+
+function sendError(res, err, context = null) {
+  const status = err.status || 500;
+
+  if (status >= 500 && context) {
+    console.error(context, err);
+  }
+
+  res.status(status).send(context + err.message);
+}
+
+exports.displayPosts = async (req, res) => {
+  try {
+    const sort = req.query.sort || 'new';
+    const posts = await postService.getAllPosts(sort);
+    const userId = req.user._id;
+    res.render('home', { posts, sort, userId });
+  } catch (err) {
+    sendError(res, err, 'Error rendering /home:');
+  }
+};
+
+exports.upvotePost = async (req, res) => {
+  const { id } = req.params;
+  const { route } = req.body;
+  const userId = req.user._id;
+
+  try {
+    await postService.upvotePost({ userId, postId: id });
+
+    res.redirect(route);
+  } catch (err) {
+    sendError(res, err)
+  }
+}
+
+exports.downvotePost = async (req, res) => {
+  const { id } = req.params;
+  const { route } = req.body;
+  const userId = req.user._id;
+
+  try {
+    await postService.downvotePost({ userId, postId: id });
+
+    res.redirect(route);
+  } catch (err) {
+    sendError(res,err)
+  }
+}
+
+exports.displayCreatePost = (req, res) => {
+  res.render('posts/create-post');
+};
+
+exports.createPost = async (req, res) => {
+  try {
+    const { title, imageURL, description } = req.body;
+
+    await postService.createPost({
+      title,
+      imageURL,
+      description,
+      author: req.user.username
+    });
+
+    res.redirect('/posts');
+  } catch (err) {
+    sendError(res, err, 'Error creating post:');
+  }
+};
+
+exports.addComment = async (req, res) => {
+  const commentText = req.body.add_comment;
+  const author = req.user.username;
+  const { id } = req.params;
+
+  try {
+    await postService.addCommentToPost({
+      postId: id,
+      commentText,
+      author
+    });
+
+    res.redirect(`/posts/${id}`);
+  } catch (err) {
+    sendError(res, err, 'Error adding comment:');
+  }
+};
+
+exports.deleteComment = async (req, res) => {
+  const { postId, commentId } = req.params;
+  const user = req.user.username;
+
+  try {
+    await postService.deleteCommentFromPost({
+      postId,
+      commentId,
+      username: user
+    });
+
+    res.redirect(`/posts/${postId}`);
+  } catch (err) {
+    sendError(res, err, 'Error deleting comment:');
+  }
+};
+
+exports.editComment = async (req, res) => {
+  const { postId, commentId } = req.params;
+  const updatedText = req.body.updated_comment;
+  const user = req.user.username;
+
+  try {
+    await postService.editCommentInPost({
+      postId,
+      commentId,
+      updatedText,
+      username: user
+    });
+
+    res.redirect(`/posts/${postId}`);
+  } catch (err) {
+    sendError(res, err, 'Error editing comment:');
+  }
+};
+
+exports.displayPost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = req.user.username;
+    const userId = req.user._id;
+
+    const post = await postService.getPostByIdWithComments({ postId: id });
+
+    res.render('posts/post', {
+      post,
+      user,
+      userId
+    });
+  } catch (err) {
+    sendError(res, err, 'Error displaying post:');
+  }
+};
+
+exports.editPost = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { title, imageURL, description } = req.body;
+        const username = req.user.username;
+
+        await postService.updatePost({
+            postId: id,
+            title,
+            imageURL,
+            description,
+            username
+        });
+
+        res.redirect(`/posts/${id}`);
+    } catch (err) {
+        sendError(res, err, 'Error updating post:');
+    }
+};
+
+exports.deletePost = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const username = req.user.username;
+
+        await postService.deletePost({ postId: id, username });
+
+        res.redirect('/posts');
+    } catch (err) {
+        sendError(res, err, 'Error deleting post:');
+    }
+};
+
+exports.displayEditPost = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const post = await postService.getPostByIdWithComments({ postId: id });
+
+    res.render('posts/edit-post', { post }); 
+  } catch (err) {
+    sendError(res, err, 'Error displaying edit page:');
+  }
+};

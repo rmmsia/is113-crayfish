@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crayfish: Invite</title>
+</head>
+<body>
+    <%- include('header') %>
+    <h1>Invite a Friend</h1>
+    <form action="/invite/generate" method="post">
+        <p>To create an invitation, please enter the email of the person you would like to invite to join Crayfish.</p>
+
+        <label for="email">Email:</label>
+        <input type="email" name="email" id="email" value="<%= email || '' %>" required>
+
+        <% if (error) { %>
+            <p style="color:red;"><%= error %></p>
+        <% } %>
+
+        <br><br>
+        <button type="submit">Generate a invite link</button>
+    </form>
+    
+    <% if (inviteList && inviteList.length > 0) { %>
+     <h2>Invites</h2>
+     <table border="1" class="invite-table" >
+        <tr>
+            <th><b>InviteID</b></th>
+            <th><b>Status</b></th>
+            <th><b>Invited User</b></th>
+        </tr>
+
+        <!-- EJS Loop to render each Invite -->    
+        <% inviteList.forEach(invitation => { %>
+            <tr>
+                <td><%= invitation.code %></td>
+                <td><%= invitation.status %></td>
+                <td><%= invitation.targetEmail %></td> 
+            </tr>
+        <% }) %>
+
+     </table>
+
+     <style>
+        .invite-table {
+            width: 70%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .invite-table th {
+            background-color: #f2f2f2;
+            padding: 10px;
+        }
+
+        .invite-table td {
+            padding: 10px;
+            text-align: center;
+        }
+    </style>
+
+    <% } %>
+</body
