@@ -239,6 +239,7 @@ body {
 
 .comment-text {
   white-space: pre-line;
+  overflow-wrap: anywhere;
   margin-left: 15px;
   display: block;
 }
@@ -259,6 +260,7 @@ body {
 
 .description {
   white-space: pre-line;
+  overflow-wrap: anywhere;
 }
 
 .truncate {
