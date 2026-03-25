@@ -14,13 +14,14 @@ function createServiceError(message, status = 500, code = null) {
 }
 
 exports.getUserStats = async (username) => {
-  const posts = await Post.find({ author: username });
-  const totalPosts = posts.length || 0;
+  const userPosts = await Post.find({ author: username });
+  const totalPosts = userPosts.length || 0;
   const totalComments = await Comment.countDocuments({ author: username }) || 0;
-  const totalKarma = posts.reduce((karma, post) => karma + ((post.upvotes - post.downvotes) || 0), 0);
+  const allPosts = await Post.find();
+  const totalKarma = allPosts.reduce((karma, post) => karma + ((post.upvotes.length - post.downvotes.length) || 0), 0);
 
   return {
-    posts,
+    posts: userPosts,
     totalPosts,
     totalComments,
     totalKarma
