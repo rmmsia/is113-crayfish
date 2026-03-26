@@ -1,3 +1,4 @@
+const Tag = require('../models/Tag');
 const postService = require('../services/post-service');
 
 function sendError(res, err, context = null) {
@@ -49,22 +50,32 @@ exports.downvotePost = async (req, res) => {
   }
 }
 
-exports.displayCreatePost = (req, res) => {
-  res.render('posts/create-post');
+exports.displayCreatePost = async (req, res) => {
+  const tags = await Tag.find({}) || [];
+  res.render('posts/create-post', {
+    tags
+  });
 };
 
 exports.createPost = async (req, res) => {
   try {
-    const { title, imageURL, description, tags } = req.body;
+    const { title, imageURL, description, existingTags, newTags } = req.body;
 
-    const tagsArray = tags ? [].concat(tags) : [];
+    //normalise existing tags
+    const existingTagsArray = Array.isArray(existingTags) ? existingTags : [existingTags];
+    //normalise new tags, save them
+    const newTagsArray = newTags.split(',').map(tag =>  tag.trim()).filter(tag => tag.length > 0);
+    const newTagsIdArray = await postService.createTags({ names: newTagsArray });
+    //prevent tag duplicates
+    const allTags = [...new Set([...existingTagsArray, ...newTagsIdArray])]
 
+    //create post
     await postService.createPost({
       title,
       imageURL,
       description,
       author: req.user.username,
-      tags: tagsArray
+      tags: allTags
     });
 
     res.redirect('/posts');
@@ -133,7 +144,7 @@ exports.displayPost = async (req, res) => {
     const user = req.user.username;
     const userId = req.user._id;
 
-    const post = await postService.getPostByIdWithComments({ postId: id });
+    const post = await postService.getPost({ postId: id });
 
     res.render('posts/post', {
       post,

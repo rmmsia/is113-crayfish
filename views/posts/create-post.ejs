@@ -63,21 +63,19 @@
                         <textarea id="description" name="description" placeholder="What's on your mind?"
                             rows="5"></textarea>
                     </div>
-                    <div class="form-group">
-                        <label>Tags</label>
-                        <div class="tags-container">
-                            <% const availableTags=['News', 'Photography' , 'Help' , 'Question' , 'Discussion' ]; %>
-                                <% availableTags.forEach(tag=> { %>
-                                    <div class="tag-checkbox">
-                                        <input type="checkbox" id="tag-<%= tag %>" name="tags" value="<%= tag %>">
-                                        <label for="tag-<%= tag %>">
-                                            <%= tag %>
-                                        </label>
-                                    </div>
-                                    <% }) %>
-                        </div>
-                    </div>
 
+                    <% if (tags.length > 0) { %>
+                      <label>Select tags: </label><br>
+                      <% tags.forEach(tag => { %>
+                        <input type="checkbox" name="existingTags" value="<%= tag._id %>">
+                        <%= tag.name %><br>
+                      <% }) %>
+                    <% } %>                 
+
+                    <div class="form-group">
+                        <label>Or create new tags: (comma seperated)</label>
+                        <input type="text" placeholder="e.g. news,questions" name="newTags">
+                    </div>
                     <button type="submit">Post</button>
                 </form>
             </div>

@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
+const Tag = require('../models/Tag');
 
 function createServiceError(message, status = 500, code = null) {
 	const error = new Error(message);
@@ -51,6 +52,20 @@ exports.createPost = async ({ title, imageURL, description, author }) => {
 
 	return post.save();
 };
+
+exports.createTags = async({ names }) => {
+  console.log(names)
+  const tagIds = []
+  
+  for (const name of names) {
+    //find tag
+    let tag = await Tag.findOne({ name });
+    if (!tag) tag = await Tag.create({ name });
+    tagIds.push(tag._id);
+  }
+
+  return tagIds;
+}
 
 exports.upvotePost = async ({ userId, postId }) => {
   const post = await Post.findById(postId);
@@ -182,12 +197,12 @@ exports.editCommentInPost = async ({ postId, commentId, updatedText, username })
 	return comment;
 };
 
-exports.getPostByIdWithComments = async ({ postId }) => {
+exports.getPost = async ({ postId }) => {
 	if (!mongoose.isValidObjectId(postId)) {
 		throw createServiceError('Post not found.', 404);
 	}
 
-	const post = await Post.findById(postId).populate('comments');
+	const post = await Post.findById(postId).populate('comments').populate('tags');
 
 	if (!post) {
 		throw createServiceError('Post not found.', 404);
@@ -207,7 +222,7 @@ exports.updatePost = async ({ postId, title, imageURL, description, username, ta
     post.title = title;
     post.imageURL = imageURL;
     post.description = description;
-	post.tags = tags || [];
+	  post.tags = tags || [];
     
     return await post.save();
 };
@@ -223,22 +238,4 @@ exports.deletePost = async ({ postId, username }) => {
     await Comment.deleteMany({ _id: { $in: post.comments } });
     
     return await Post.findByIdAndDelete(postId);
-};
-
-exports.createPost = async ({ title, imageURL, description, author, tags }) => {
-    return await Post.create({
-        title,
-        imageURL,
-        description,
-        author,
-        tags: tags || []
-    });
-};
-
-exports.updatePostInDB = async (postId, { title, imageURL, description, tags }, username) => {
-    post.title = title;
-    post.imageURL = imageURL;
-    post.description = description;
-    post.tags = tags || [];
-    return await post.save();
 };
