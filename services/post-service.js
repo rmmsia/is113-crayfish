@@ -14,7 +14,7 @@ function createServiceError(message, status = 500, code = null) {
 }
 
 exports.getAllPosts = async (sort = 'new') => {
-	const posts = await Post.find();
+	const posts = await Post.find().populate('tags');
 
 	//Sort by upvotes
 	if (sort === 'top') {
@@ -39,12 +39,13 @@ exports.getAllPosts = async (sort = 'new') => {
 	return posts.sort((a, b) => b.createdAt - a.createdAt);
 };
 
-exports.createPost = async ({ title, imageURL, description, author }) => {
+exports.createPost = async ({ title, imageURL, description, author, tags }) => {
 	const post = new Post({
 		title,
 		imageURL,
 		description,
 		author,
+		tags: tags || [],
 		upvotes: [],
 		downvotes: []
 	});
@@ -186,8 +187,8 @@ exports.getPostByIdWithComments = async ({ postId }) => {
 	if (!mongoose.isValidObjectId(postId)) {
 		throw createServiceError('Post not found.', 404);
 	}
-
-	const post = await Post.findById(postId).populate('comments');
+	
+	const post = await Post.findById(postId).populate('comments').populate('tags');
 
 	if (!post) {
 		throw createServiceError('Post not found.', 404);

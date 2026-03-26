@@ -1,4 +1,5 @@
 const postService = require('../services/post-service');
+const Tag = require('../models/Tag');
 
 function sendError(res, err, context = null) {
   const status = err.status || 500;
@@ -49,8 +50,13 @@ exports.downvotePost = async (req, res) => {
   }
 }
 
-exports.displayCreatePost = (req, res) => {
-  res.render('posts/create-post');
+exports.displayCreatePost = async (req, res) => {
+  try {
+    const tags = await Tag.find(); 
+    res.render('posts/create-post', { tags });
+  } catch (err) {
+    sendError(res, err, 'Error displaying create page:');
+  }
 };
 
 exports.createPost = async (req, res) => {
@@ -185,9 +191,11 @@ exports.displayEditPost = async (req, res) => {
   try {
     const { id } = req.params;
     const post = await postService.getPostByIdWithComments({ postId: id });
+    const tags = await Tag.find();
 
-    res.render('posts/edit-post', { post }); 
+    res.render('posts/edit-post', { post, tags }); 
   } catch (err) {
     sendError(res, err, 'Error displaying edit page:');
   }
 };
+
