@@ -29,6 +29,7 @@
             <th><b>InviteID</b></th>
             <th><b>Status</b></th>
             <th><b>Invited User</b></th>
+            <th><b>Invitee Email</b></th>
         </tr>
 
         <!-- EJS Loop to render each Invite -->    
@@ -36,7 +37,8 @@
             <tr>
                 <td><%= invitation.code %></td>
                 <td><%= invitation.status %></td>
-                <td><%= invitation.targetEmail %></td> 
+                <td><% if (invitation.usedBy) { %><a href="/profile/u/<%= invitation.usedBy %>"><%= invitation.usedBy %></a><% } %></td>
+                <td><%= invitation.targetEmail %></td>
             </tr>
         <% }) %>
 
