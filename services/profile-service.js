@@ -17,8 +17,7 @@ exports.getUserStats = async (username) => {
   const userPosts = await Post.find({ author: username });
   const totalPosts = userPosts.length || 0;
   const totalComments = await Comment.countDocuments({ author: username }) || 0;
-  const allPosts = await Post.find();
-  const totalKarma = allPosts.reduce((karma, post) => karma + ((post.upvotes.length - post.downvotes.length) || 0), 0);
+  const totalKarma = userPosts.reduce((karma, post) => karma + ((post.upvotes.length - post.downvotes.length) || 0), 0);
 
   return {
     posts: userPosts,
