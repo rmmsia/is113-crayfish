@@ -55,6 +55,14 @@
             <span class="description">
               <%= post.description %>
             </span>
+            
+            <% if (post.tags && post.tags.length> 0) { %>
+              <div class="post-tags-display">
+                <% post.tags.forEach(tag=> { %>
+                  <span class="tag-item">#<%= tag.name %></span>
+                  <% }) %>
+              </div>
+              <% } %>
             <br />
             <div class="post-sub">
               <span class="author">By <a href="/profile/u/<%= post.author %>" class="author">@<%= post.author %>

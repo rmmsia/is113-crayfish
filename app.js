@@ -27,6 +27,17 @@ server.use(
   })
 );
 
+// const Tag = require('./models/Tag');
+// const seedTags = async () => {
+//   const count = await Tag.countDocuments();
+//   if (count === 0) {
+//     await Tag.insertMany([
+//       { name: 'News' }, { name: 'Photography' }, { name: 'Help' }, { name: 'Discussion' },  { name: 'Art' }, { name: 'Memes' }, 
+//     ]);
+//   }
+// };
+// seedTags();
+
 server.set("view engine", "ejs")
 
 server.use("/", express.static(path.join(__dirname, "public")));

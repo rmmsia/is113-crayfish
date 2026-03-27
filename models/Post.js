@@ -5,6 +5,7 @@ const postSchema = new mongoose.Schema({
     imageURL: {type: String},
     description: {type: String},
     author: {type: String},
+    tags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }],
     upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     comments: [{type: mongoose.Schema.Types.ObjectId, ref: 'Comment' }]

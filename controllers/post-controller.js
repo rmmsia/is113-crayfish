@@ -1,4 +1,5 @@
 const postService = require('../services/post-service');
+const Tag = require('../models/Tag');
 
 function sendError(res, err, context = null) {
   const status = err.status || 500;
@@ -49,19 +50,36 @@ exports.downvotePost = async (req, res) => {
   }
 }
 
-exports.displayCreatePost = (req, res) => {
-  res.render('posts/create-post');
+exports.displayCreatePost = async (req, res) => {
+  try {
+    const tags = await Tag.find({}) || [];
+    res.render('posts/create-post', {
+      tags
+    });
+  } catch (err) {
+    sendError(res, err, 'Error displaying create page:');
+  }
 };
 
 exports.createPost = async (req, res) => {
   try {
-    const { title, imageURL, description } = req.body;
+    const { title, imageURL, description, existingTags, newTags } = req.body;
 
+    //normalise existing tags
+    const existingTagsArray = Array.isArray(existingTags) ? existingTags : [existingTags];
+    //normalise new tags, save them
+    const newTagsArray = newTags.split(',').map(tag =>  tag.trim()).filter(tag => tag.length > 0);
+    const newTagsIdArray = await postService.createTags({ names: newTagsArray });
+    //prevent tag duplicates
+    const allTags = [...new Set([...existingTagsArray, ...newTagsIdArray])]
+
+    //create post
     await postService.createPost({
       title,
       imageURL,
       description,
-      author: req.user.username
+      author: req.user.username,
+      tags: allTags
     });
 
     res.redirect('/posts');
@@ -130,7 +148,7 @@ exports.displayPost = async (req, res) => {
     const user = req.user.username;
     const userId = req.user._id;
 
-    const post = await postService.getPostByIdWithComments({ postId: id });
+    const post = await postService.getPost({ postId: id });
 
     res.render('posts/post', {
       post,
@@ -145,15 +163,24 @@ exports.displayPost = async (req, res) => {
 exports.editPost = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, imageURL, description } = req.body;
+        const { title, imageURL, description, existingTags, newTags } = req.body;
         const username = req.user.username;
+
+         //normalise existing tags
+        const existingTagsArray = Array.isArray(existingTags) ? existingTags : [existingTags];
+        //normalise new tags, save them
+        const newTagsArray = newTags.split(',').map(tag =>  tag.trim()).filter(tag => tag.length > 0);
+        const newTagsIdArray = await postService.createTags({ names: newTagsArray });
+        //prevent tag duplicates
+        const allTags = [...new Set([...existingTagsArray, ...newTagsIdArray])]
 
         await postService.updatePost({
             postId: id,
             title,
             imageURL,
             description,
-            username
+            username,
+            tags: allTags
         });
 
         res.redirect(`/posts/${id}`);
@@ -178,10 +205,12 @@ exports.deletePost = async (req, res) => {
 exports.displayEditPost = async (req, res) => {
   try {
     const { id } = req.params;
-    const post = await postService.getPostByIdWithComments({ postId: id });
+    const post = await postService.getPost({ postId: id });
+    const tags = await Tag.find();
 
-    res.render('posts/edit-post', { post }); 
+    res.render('posts/edit-post', { post, tags }); 
   } catch (err) {
     sendError(res, err, 'Error displaying edit page:');
   }
 };
+

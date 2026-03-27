@@ -24,6 +24,26 @@
             <textarea id="description" name="description" rows="5" placeholder="What's on your mind?"><%= post.description %></textarea>
         </div>
 
+        <div class="form-group">
+            <label>Tags</label>
+            <div class="tags-container">
+                <% if (tags.length > 0) { %>
+                <label>Select tags: </label><br>
+                <% tags.forEach(tag => { %>
+                  <input type="checkbox" name="existingTags" value="<%= tag._id %>" <%= (post.tags || []).some(selectedTag => selectedTag._id.toString() === tag._id.toString()) ? 'checked' : '' %>>
+                  <%= tag.name %><br>
+                <% }) %>
+              <% } %>                 
+
+              <div class="form-group">
+                  <label>Or create new tags: (comma seperated)</label>
+                  <input type="text" placeholder="e.g. news,questions" name="newTags">
+              </div>
+            </div>
+        </div>
+          
+    </div>
+
         <div class="form-row">
             <button type="submit">Update Post</button>
         </div>
