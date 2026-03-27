@@ -41,8 +41,9 @@ exports.registerUser = async ({ username, email, password, inviter, vcode }) => 
 
   await newUser.save();
 
-  // update invite status
+  // update invite status and usedBy
   invite.status = "Used";
+  invite.usedBy = username;
   await invite.save();
 
   return newUser;
