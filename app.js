@@ -13,7 +13,7 @@ const postRoutes = require('./routes/post');
 const server = express();
 const port = process.env.PORT || 3000;
 const path = require("path");
-const { requireLogin } = require('./middleware/auth');
+const { setLocals, requireLogin } = require('./middleware/auth');
 
 // set environment variables from .env file
 require("dotenv").config();
@@ -48,6 +48,7 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.log('Connection error: ', err));
 
+server.use(setLocals);
 server.use('/', authRoutes);
 server.use('/profile', requireLogin, profileRoutes);
 server.use('/invite', requireLogin, inviteRoutes);
