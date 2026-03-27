@@ -56,15 +56,9 @@ server.use('/posts', requireLogin, postRoutes);
 server.get("/", (req, res) => {
   if (req.session.userId) {
     return res.redirect("/posts");
+  } else {
+    return res.redirect("/login");
   }
-  res.render("landing");
-});
-
-server.get("/index.html", (req, res) => {
-  if (req.session.userId) {
-    return res.redirect("/posts");
-  }
-  res.render("landing");
 });
 
 server.listen(port, () => {
