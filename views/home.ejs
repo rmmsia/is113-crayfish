@@ -19,12 +19,12 @@
 
                 <div class="voting-col">
                     <form action="/posts/<%= post.id %>/upvote" method="post">
-                      <input type="hidden" value="<%= route %>" name="route">
+                      <input type="hidden" value="/posts" name="route">
                       <button type="submit" class="up vote-btn <%= (post.upvotes || []).includes(userId) ? 'voted-up' : '' %>" title="upvote">▲</button>
                     </form>
                     <span class="score" data-id="<%= post.id %>"><%= post.upvotes?.length - post.downvotes?.length %></span>
                     <form action="/posts/<%= post.id %>/downvote" method="post">
-                      <input type="hidden" value="<%= route %>" name="route">
+                      <input type="hidden" value="/posts" name="route">
                       <button type="submit" class="down vote-btn <%= (post.downvotes || []).includes(userId) ? 'voted-down' : '' %>" title="downvote">▼</button>
                     </form>
                 </div>
