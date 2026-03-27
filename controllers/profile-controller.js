@@ -52,11 +52,7 @@ exports.visitOtherProfile = async (req, res) => {
 }
 
 exports.displayUpdateProfile = async (req, res) => {
-  const user = req.user;
-  
-  res.render('profile/update-profile', {
-    user
-  })
+  res.render('profile/update-profile');
 }
 
 exports.submitUpdateProfile = async (req, res) => {

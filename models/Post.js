@@ -4,7 +4,7 @@ const postSchema = new mongoose.Schema({
     title: {type: String, required: true},
     imageURL: {type: String},
     description: {type: String},
-    author: {type: String},
+    author: {type: String, required: true},
     tags: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tag' }],
     upvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     downvotes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
