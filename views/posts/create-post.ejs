@@ -66,18 +66,18 @@
                     <div class="form-group">
                         <label>Tags</label>
                         <div class="tags-container">
-                            <% if (tags && tags.length > 0) { %>
-                                <% tags.forEach(tag => { %>
-                                    <div class="tag-checkbox">
-                                        <input type="checkbox" id="tag-<%= tag._id %>" name="tags" value="<%= tag._id %>">
-                                        <label for="tag-<%= tag._id %>">
-                                            <%= tag.name %>
-                                        </label>
-                                    </div>
-                                <% }) %>
-                            <% } else { %>
-                                <p style="font-size: 0.8em; color: gray;">No tags available.</p>
-                            <% } %>
+                            <% if (tags.length > 0) { %>
+                            <label>Select tags: </label><br>
+                            <% tags.forEach(tag => { %>
+                              <input type="checkbox" name="existingTags" value="<%= tag._id %>">
+                              <%= tag.name %><br>
+                            <% }) %>
+                          <% } %>                 
+
+                          <div class="form-group">
+                              <label>Or create new tags: (comma seperated)</label>
+                              <input type="text" placeholder="e.g. news,questions" name="newTags">
+                          </div>
                         </div>
                     </div>
 

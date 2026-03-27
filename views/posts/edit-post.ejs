@@ -25,23 +25,23 @@
         </div>
 
         <div class="form-group">
-    <label>Tags</label>
-    <div class="tags-container">
-        <% if (tags && tags.length> 0) { %>
-            <% tags.forEach(tag=> { %>
-                <div class="tag-checkbox">
-                    <input type="checkbox" id="tag-<%= tag._id %>" name="tags" value="<%= tag._id %>"
-                    <%= (post.tags && post.tags.some(postTag=> postTag._id.toString() === tag._id.toString())) ? 'checked' :
-                        '' %>>
-                        <label for="tag-<%= tag._id %>">
-                            <%= tag.name %>
-                        </label>
-                </div>
+            <label>Tags</label>
+            <div class="tags-container">
+                <% if (tags.length > 0) { %>
+                <label>Select tags: </label><br>
+                <% tags.forEach(tag => { %>
+                  <input type="checkbox" name="existingTags" value="<%= tag._id %>" <%= (post.tags || []).some(selectedTag => selectedTag._id.toString() === tag._id.toString()) ? 'checked' : '' %>>
+                  <%= tag.name %><br>
                 <% }) %>
-                    <% } else { %>
-                        <p>No tags available in database.</p>
-                        <% } %>
-    </div>
+              <% } %>                 
+
+              <div class="form-group">
+                  <label>Or create new tags: (comma seperated)</label>
+                  <input type="text" placeholder="e.g. news,questions" name="newTags">
+              </div>
+            </div>
+        </div>
+          
     </div>
 
         <div class="form-row">
