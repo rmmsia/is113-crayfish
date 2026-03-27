@@ -16,7 +16,10 @@ exports.displayPosts = async (req, res) => {
     const sort = req.query.sort || 'new';
     const posts = await postService.getAllPosts(sort);
     const userId = req.user._id;
-    res.render('home', { posts, sort, userId });
+    const route = req.originalUrl
+    //console.log(route);
+
+    res.render('home', { posts, sort, userId, route });
   } catch (err) {
     sendError(res, err, 'Error rendering /home:');
   }
@@ -65,13 +68,7 @@ exports.createPost = async (req, res) => {
   try {
     const { title, imageURL, description, existingTags, newTags } = req.body;
 
-    //normalise existing tags
-    const existingTagsArray = Array.isArray(existingTags) ? existingTags : [existingTags];
-    //normalise new tags, save them
-    const newTagsArray = newTags.split(',').map(tag =>  tag.trim()).filter(tag => tag.length > 0);
-    const newTagsIdArray = await postService.createTags({ names: newTagsArray });
-    //prevent tag duplicates
-    const allTags = [...new Set([...existingTagsArray, ...newTagsIdArray])]
+    const allTags = await postService.combineTags({ existingTags, newTags });
 
     //create post
     await postService.createPost({
@@ -166,13 +163,7 @@ exports.editPost = async (req, res) => {
         const { title, imageURL, description, existingTags, newTags } = req.body;
         const username = req.user.username;
 
-         //normalise existing tags
-        const existingTagsArray = Array.isArray(existingTags) ? existingTags : [existingTags];
-        //normalise new tags, save them
-        const newTagsArray = newTags.split(',').map(tag =>  tag.trim()).filter(tag => tag.length > 0);
-        const newTagsIdArray = await postService.createTags({ names: newTagsArray });
-        //prevent tag duplicates
-        const allTags = [...new Set([...existingTagsArray, ...newTagsIdArray])]
+        const allTags = await postService.combineTags({ existingTags, newTags });
 
         await postService.updatePost({
             postId: id,
