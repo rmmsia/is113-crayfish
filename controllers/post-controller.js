@@ -142,16 +142,8 @@ exports.editComment = async (req, res) => {
 exports.displayPost = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = req.user.username;
-    const userId = req.user._id;
-
     const post = await postService.getPost({ postId: id });
-
-    res.render('posts/post', {
-      post,
-      user,
-      userId
-    });
+    res.render('posts/post', { post });
   } catch (err) {
     sendError(res, err, 'Error displaying post:');
   }

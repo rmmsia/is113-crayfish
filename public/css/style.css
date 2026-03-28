@@ -15,7 +15,7 @@ body {
   border-bottom: 2px solid #777;
 }
 
-.profile-icon {
+.nav-div {
   position: absolute;
   right: 1rem;
   top: 50%;
@@ -25,14 +25,9 @@ body {
   align-items: center;
 }
 
-.create-post {
+.nav-div a {
   border: 1px solid black;
   padding: 4px 10px;
-  text-decoration: none;
-  color: black;
-}
-
-.profile-link {
   text-decoration: none;
   color: black;
 }

@@ -185,7 +185,7 @@ exports.deleteCommentFromPost = async ({ postId, commentId, username }) => {
 	}
 
 	if (username !== comment.author) {
-		throw createServiceError("Unauthorized to delete other users' comments", 404);
+		throw createServiceError("Unauthorized to delete other users' comments", 403);
 	}
 
 	await Comment.findByIdAndDelete(commentId);
@@ -200,7 +200,7 @@ exports.editCommentInPost = async ({ postId, commentId, updatedText, username })
 	}
 
 	if (!updatedText) {
-		throw createServiceError("Comment doesn't exist", 404);
+		throw createServiceError("Comment text cannot be empty", 404);
 	}
 
 	const comment = await Comment.findById(commentId);
@@ -210,7 +210,7 @@ exports.editCommentInPost = async ({ postId, commentId, updatedText, username })
 	}
 
 	if (username !== comment.author) {
-		throw createServiceError("Unauthorized to edit other users' comments", 404);
+		throw createServiceError("Unauthorized to edit other users' comments", 403);
 	}
 
 	comment.text = updatedText;
