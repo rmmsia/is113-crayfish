@@ -10,6 +10,7 @@ const profileRoutes = require('./routes/profile');
 const inviteRoutes = require('./routes/invite');
 const postRoutes = require('./routes/post');
 const pagesRoutes = require('./routes/pages');
+const userTreeRoutes = require('./routes/usertree');
 
 const server = express();
 const port = process.env.PORT || 3000;
@@ -28,17 +29,6 @@ server.use(
   })
 );
 
-// const Tag = require('./models/Tag');
-// const seedTags = async () => {
-//   const count = await Tag.countDocuments();
-//   if (count === 0) {
-//     await Tag.insertMany([
-//       { name: 'News' }, { name: 'Photography' }, { name: 'Help' }, { name: 'Discussion' },  { name: 'Art' }, { name: 'Memes' }, 
-//     ]);
-//   }
-// };
-// seedTags();
-
 server.set("view engine", "ejs")
 
 server.use("/", express.static(path.join(__dirname, "public")));
@@ -55,6 +45,7 @@ server.use('/profile', requireLogin, profileRoutes);
 server.use('/invite', requireLogin, inviteRoutes);
 server.use('/posts', requireLogin, postRoutes);
 server.use('/', pagesRoutes);
+server.use('/usertree', userTreeRoutes);
 
 server.get("/", (req, res) => {
   if (req.session.userId) {
