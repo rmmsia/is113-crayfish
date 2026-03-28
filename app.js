@@ -9,6 +9,7 @@ const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const inviteRoutes = require('./routes/invite');
 const postRoutes = require('./routes/post');
+const pagesRoutes = require('./routes/pages');
 
 const server = express();
 const port = process.env.PORT || 3000;
@@ -53,6 +54,7 @@ server.use('/', authRoutes);
 server.use('/profile', requireLogin, profileRoutes);
 server.use('/invite', requireLogin, inviteRoutes);
 server.use('/posts', requireLogin, postRoutes);
+server.use('/', pagesRoutes);
 
 server.get("/", (req, res) => {
   if (req.session.userId) {
