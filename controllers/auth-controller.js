@@ -11,7 +11,7 @@ function sendError(res, err, context = null) {
 }
 
 exports.registerGet = (req, res) => {
-  res.render("auth/register");
+  res.render("auth/register", { errors: null, formData: null });
 };
 
 exports.registerPost = async (req, res) => {
@@ -19,11 +19,18 @@ exports.registerPost = async (req, res) => {
 
   try {
     await authService.registerUser({ username, email, password, inviter, vcode });
-    res.redirect("/login");
+    res.redirect("/register-success");
   } catch (err) {
-    sendError(res, err, 'Error registering user: ')
+    res.render('auth/register', {
+      errors: err.errors || [err.message],
+      formData: { username, email, password, inviter, vcode }
+    });
   }
 };
+
+exports.registerSuccess = async (req, res) => {
+  res.render("auth/register-success")
+}
 
 exports.loginGet = (req, res) => {
   res.render("auth/login", { error: null });
@@ -52,3 +59,52 @@ exports.processLogout = (req, res) => {
     res.redirect("/login");
   });
 };
+
+exports.forgotPasswordGet = async (req, res) => {
+  res.render("auth/forgot-password", { error: null, resetLink: null, email: null });
+}
+
+exports.forgotPasswordPost = async (req, res) => {
+  const { email } = req.body;
+
+  try {
+    const token = await authService.generateResetPasswordToken({ email });
+
+    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+
+    res.render("auth/forgot-password", { resetLink, email, error: null });
+  } catch (err) {
+
+    res.render("auth/forgot-password", { resetLink: null, error: err.message, email });
+  }
+}
+
+exports.resetPasswordGet = async (req, res) => {  
+  const { token } = req.query;
+
+  res.render('auth/reset-password', { token, password: null, error: null });
+}
+
+exports.resetPasswordPost = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  try {
+    await authService.resetPassword({
+      token,
+      newPassword: password
+    });
+
+    res.redirect('/reset-success');
+  } catch (err) {
+    res.render('auth/reset-password', { 
+      token, 
+      password,
+      errors: err.errors || [err.message]
+    })
+  }
+}
+
+exports.resetSuccess = async (req, res) => {
+  res.render('auth/reset-success');
+}
