@@ -29,7 +29,8 @@
             <th><b>InviteID</b></th>
             <th><b>Status</b></th>
             <th><b>Invited User</b></th>
-            <th><b>Invitee Email</b></th>
+            <th><b>Invitee Email</b></th> 
+            <th><b>Action</b></th>
         </tr>
 
         <!-- EJS Loop to render each Invite -->    
@@ -39,6 +40,25 @@
                 <td><%= invitation.status %></td>
                 <td><% if (invitation.usedBy) { %><a href="/profile/u/<%= invitation.usedBy %>"><%= invitation.usedBy %></a><% } %></td>
                 <td><%= invitation.targetEmail %></td>
+                <td>
+                    <% if (invitation.status === 'Pending') { %>
+                    <form action="/invite/update" method="post">
+                        <input type="hidden" name="code" value="<%= invitation.code %>">
+                        <input type="email" name="email" value="<%= invitation.targetEmail %>">
+                        <button type="submit">Update</button>
+                    </form>
+                    
+                    <form action="/invite/retract" method="post">
+                        <input type="hidden" name="code" value="<%= invitation.code %>">
+                        <input type="hidden" name="email" value="<%= invitation.targetEmail %>">
+                        <button type="submit">Retract</button>
+                     </form>
+                
+                    
+                     <% } else { %>
+                        <span>-</span>    
+                    <% } %>
+                </td>
             </tr>
         <% }) %>
 
@@ -63,4 +83,4 @@
     </style>
 
     <% } %>
-</body
+</body>
