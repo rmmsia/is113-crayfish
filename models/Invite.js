@@ -4,7 +4,7 @@ const inviteSchema = new mongoose.Schema({
     createdBy: {type: String, required: true},
     targetEmail: {type: String, required: true, unique: true},
     status: {type: String},
-    code: {type: String},
+    code: {type: String, unique: true},
     usedBy: {type: String}
 }, { timestamps: true });
 
