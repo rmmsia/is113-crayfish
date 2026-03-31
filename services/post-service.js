@@ -153,7 +153,7 @@ exports.downvotePost = async({ userId, postId }) => {
 
 exports.addCommentToPost = async ({ postId, commentText, author }) => {
 	if (!mongoose.isValidObjectId(postId)) {
-		throw createServiceError('Post not found.', 404);
+		throw createServiceError('Invalid Post', 400);
 	}
 
 	const newComment = new Comment({
@@ -166,8 +166,7 @@ exports.addCommentToPost = async ({ postId, commentText, author }) => {
 
 	await Post.findByIdAndUpdate(
 		postId,
-		{ $push: { comments: savedComment._id } },
-		{ returnDocument: 'after' }
+		{ $push: { comments: savedComment._id } }
 	);
 
 	return savedComment;
@@ -175,7 +174,7 @@ exports.addCommentToPost = async ({ postId, commentText, author }) => {
 
 exports.deleteCommentFromPost = async ({ postId, commentId, username }) => {
 	if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
-		throw createServiceError("Comment doesn't exist", 404);
+		throw createServiceError("Invalid Post/Comment", 400);
 	}
 
 	const comment = await Comment.findById(commentId);
@@ -196,7 +195,7 @@ exports.deleteCommentFromPost = async ({ postId, commentId, username }) => {
 
 exports.editCommentInPost = async ({ postId, commentId, updatedText, username }) => {
 	if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
-		throw createServiceError("Comment doesn't exist", 404);
+		throw createServiceError("Invalid Post/Comment", 400);
 	}
 
 	if (!updatedText) {
