@@ -82,7 +82,7 @@ exports.forgotPasswordPost = async (req, res) => {
 exports.resetPasswordGet = async (req, res) => {  
   const { token } = req.query;
 
-  res.render('auth/reset-password', { token, password: null, error: null });
+  res.render('auth/reset-password', { token, password: null, errors: null });
 }
 
 exports.resetPasswordPost = async (req, res) => {
