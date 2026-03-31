@@ -1,5 +1,6 @@
 const Invite = require('../models/Invite');
 const User = require('../models/User');
+const crypto = require('crypto');
 
 function createServiceError(message, status = 500, code = null) {
   const error = new Error(message);
@@ -12,7 +13,42 @@ function createServiceError(message, status = 500, code = null) {
   return error;
 }
 
+function validatePassword(password) {
+  let errors = []
+  
+  if (!password || password.length < 8) {
+    errors.push('Password must be at least 8 characters long.');
+  }
+
+  if (password.length > 128) {
+    errors.push('Password is too long.');
+  }
+
+  //regex test for special characters
+  const hasSpecialChars = /[^A-Za-z0-9]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+
+  if (!hasSpecialChars) {
+    errors.push('Password must contain at least one special character.');
+  }
+
+  if (!hasNumber) {
+    errors.push('Password must contain at least one number.');
+  }
+
+  if (errors.length > 0) {
+    const err = new Error("Validation failed");
+    err.errors = errors;
+    throw err;
+  }
+
+  return errors;
+}
+
 exports.registerUser = async ({ username, email, password, inviter, vcode }) => {
+  //validate password
+  validatePassword(password);
+
   // verify invite and vcode
   const invite = await Invite.findOne({
     createdBy: inviter,
@@ -64,3 +100,48 @@ exports.loginUser = async ({ username, password }) => {
 
   return user;
 };
+
+exports.generateResetPasswordToken = async({ email }) => {
+  const user = await User.findOne({ email });
+
+  
+  if (!user) {
+    throw new createServiceError('User not found', 404);
+  }
+
+  // generate token
+  const token = crypto.randomBytes(32).toString('hex');
+
+  // store hashed token
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  user.resetPasswordToken = hashedToken;
+  user.resetPasswordExpires = Date.now() + 15 * 60 * 1000; // 15 mins
+
+  await user.save();
+
+  return token;
+}
+
+exports.resetPassword = async ({ token, newPassword }) => {
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  const user = await User.findOne({ 
+    resetPasswordToken: hashedToken,
+    resetPasswordExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    throw createServiceError('Invalid or expired token', 400);
+  }
+
+  validatePassword(newPassword);
+  user.password = newPassword;
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+
+  await user.save();
+
+  return user;
+}
+
