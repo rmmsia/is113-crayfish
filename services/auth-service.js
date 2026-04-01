@@ -41,8 +41,6 @@ function validatePassword(password) {
     err.errors = errors;
     throw err;
   }
-
-  return errors;
 }
 
 exports.registerUser = async ({ username, email, password, inviter, vcode }) => {
