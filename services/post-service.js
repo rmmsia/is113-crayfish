@@ -69,24 +69,29 @@ exports.createTags = async({ names }) => {
 
 exports.combineTags = async ({ existingTags, newTags }) => {
   //normalise existing tags
-  const existingTagsArray = Array.isArray(existingTags) ? existingTags : [existingTags];
+  let normalisedExistingTags = [] 
+  
+  if (existingTags) {
+    const existingTagsArray = Array.isArray(existingTags) ? existingTags : [existingTags];
 
-  const normalizedExistingTags = existingTagsArray
-    .map((tagId) => String(tagId).trim())
-    .filter((tagId) => tagId.length > 0);
-
+    normalisedExistingTags = existingTagsArray
+      .map((tagId) => String(tagId).trim())
+      .filter((tagId) => tagId.length > 0);
+  }
+  
   //normalise new tags
   let newTagsArray = []
 
   if (typeof newTags === 'string') {
     newTagsArray = newTags.split(",").map((tag) => tag.trim()).filter((tag) => tag.length > 0);
   }
+
   //save new tags
   const newTagsIdArray = await exports.createTags({ names: newTagsArray });
-  const normalizedNewTagIds = newTagsIdArray.map((tagId) => String(tagId));
+  const normalisedNewTagIds = newTagsIdArray.map((tagId) => String(tagId));
 
   //prevent tag duplicates
-  return [...new Set([...normalizedExistingTags, ...normalizedNewTagIds])];
+  return [...new Set([...normalisedExistingTags, ...normalisedNewTagIds])];
 };
 
 exports.upvotePost = async ({ userId, postId }) => {
