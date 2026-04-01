@@ -70,7 +70,8 @@ exports.forgotPasswordPost = async (req, res) => {
   try {
     const token = await authService.generateResetPasswordToken({ email });
 
-    const resetLink = `http://localhost:3000/reset-password?token=${token}`;
+    const baseUrl = process.env.BASE_URL || "http://localhost:3000";
+    const resetLink = `${baseUrl}/reset-password?token=${token}`;
 
     res.render("auth/forgot-password", { resetLink, email, error: null });
   } catch (err) {
