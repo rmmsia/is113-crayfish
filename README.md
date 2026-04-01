@@ -8,11 +8,23 @@ There is no vetting process for new users. Each user is responsible for inviting
 
 As no member of the team has a Lobste.rs account and therefore is unfamiliar with the actual user registration flow, we drafted our own invitation mechanism that checks an invitation code against the inviting user and the email of the intended invitee (there is currently no email-sending functionality, in line with IS113 group project requirements of not using libraries beyond what was covered in class).
 
+## Prerequisites
+- Node.js v22+
+
 ## Installation
 1. Clone this repository
-2. Create the `.env` file and fill in the required fields
+2. Create the `.env` file
 ```
 cp .env.example .env
+```
+3. Fill in the required fields in `.env`
+**Examples**:
+    - `MONGO_URI=mongodb+srv://user:pass@cluster.mongodb.net/dbname`
+    - `PORT=3000`
+    - `SESSION_SECRET=any_random_string`
+4. Install required packages using
+```
+npm install
 ```
 
 ## Running
