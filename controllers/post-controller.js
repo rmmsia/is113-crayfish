@@ -1,4 +1,5 @@
 const postService = require('../services/post-service');
+const Tag = require('../models/Tag');
 
 function sendError(res, err, context = null) {
   const status = err.status || 500;
@@ -15,7 +16,10 @@ exports.displayPosts = async (req, res) => {
     const sort = req.query.sort || 'new';
     const posts = await postService.getAllPosts(sort);
     const userId = req.user._id;
-    res.render('home', { posts, sort, userId });
+    const route = req.originalUrl
+    //console.log(route);
+
+    res.render('home', { posts, sort, userId, route });
   } catch (err) {
     sendError(res, err, 'Error rendering /home:');
   }
@@ -49,19 +53,30 @@ exports.downvotePost = async (req, res) => {
   }
 }
 
-exports.displayCreatePost = (req, res) => {
-  res.render('posts/create-post');
+exports.displayCreatePost = async (req, res) => {
+  try {
+    const tags = await Tag.find({}) || [];
+    res.render('posts/create-post', {
+      tags
+    });
+  } catch (err) {
+    sendError(res, err, 'Error displaying create page:');
+  }
 };
 
 exports.createPost = async (req, res) => {
   try {
-    const { title, imageURL, description } = req.body;
+    const { title, imageURL, description, existingTags, newTags } = req.body;
 
+    const allTags = await postService.combineTags({ existingTags, newTags });
+
+    //create post
     await postService.createPost({
       title,
       imageURL,
       description,
-      author: req.user.username
+      author: req.user.username,
+      tags: allTags
     });
 
     res.redirect('/posts');
@@ -127,16 +142,8 @@ exports.editComment = async (req, res) => {
 exports.displayPost = async (req, res) => {
   try {
     const { id } = req.params;
-    const user = req.user.username;
-    const userId = req.user._id;
-
-    const post = await postService.getPostByIdWithComments({ postId: id });
-
-    res.render('posts/post', {
-      post,
-      user,
-      userId
-    });
+    const post = await postService.getPost({ postId: id });
+    res.render('posts/post', { post });
   } catch (err) {
     sendError(res, err, 'Error displaying post:');
   }
@@ -145,15 +152,18 @@ exports.displayPost = async (req, res) => {
 exports.editPost = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, imageURL, description } = req.body;
+        const { title, imageURL, description, existingTags, newTags } = req.body;
         const username = req.user.username;
+
+        const allTags = await postService.combineTags({ existingTags, newTags });
 
         await postService.updatePost({
             postId: id,
             title,
             imageURL,
             description,
-            username
+            username,
+            tags: allTags
         });
 
         res.redirect(`/posts/${id}`);
@@ -178,10 +188,23 @@ exports.deletePost = async (req, res) => {
 exports.displayEditPost = async (req, res) => {
   try {
     const { id } = req.params;
-    const post = await postService.getPostByIdWithComments({ postId: id });
+    const post = await postService.getPost({ postId: id });
+    const tags = await Tag.find();
 
-    res.render('posts/edit-post', { post }); 
+    res.render('posts/edit-post', { post, tags }); 
   } catch (err) {
     sendError(res, err, 'Error displaying edit page:');
   }
 };
+
+
+exports.displayPopularTags = async (req, res) => {
+  try {
+    const popularTags = await postService.getPopularTags(); 
+    
+    res.render("tags", { tags: popularTags });
+  } catch (err) {
+    sendError(res, err, "Error loading popular tags:");
+  }
+};
+

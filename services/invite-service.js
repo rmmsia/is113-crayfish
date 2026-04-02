@@ -59,3 +59,63 @@ exports.generateInvitation = async ({ email, inviterUsername, inviterEmail }) =>
     inviteList
   };
 };
+
+exports.retractInvitation = async ({ code, inviterUsername }) => {
+  const invite = await Invite.findOne({
+    code,
+    createdBy: inviterUsername
+  });
+
+  if (!invite) {
+    throw createServiceError('Invite not found.', 404, 'INVITE_NOT_FOUND');
+  }
+
+  if (invite.status !== 'Pending') {
+    throw createServiceError('Only pending invites can be retracted.', 400, 'INVITE_ALREADY_USED');
+  }
+
+  await Invite.deleteOne({
+    code,
+    createdBy: inviterUsername
+  });
+
+  return await exports.getInvitesByCreator(inviterUsername);
+};
+
+exports.updateInvitation = async ({ code, email, inviterUsername, inviterEmail }) => {
+  if (!EMAIL_REGEX.test(email)) {
+    throw createServiceError('Please enter a valid email address.', 400, 'INVALID_EMAIL');
+  }
+
+  if (email === inviterEmail) {
+    throw createServiceError('You cannot invite yourself.', 400, 'SELF_INVITE');
+  }
+
+  const invite = await Invite.findOne({
+    code,
+    createdBy: inviterUsername
+  });
+
+  if (!invite) {
+    throw createServiceError('Invite not found.', 404, 'INVITE_NOT_FOUND');
+  }
+
+  if (invite.status !== 'Pending') {
+    throw createServiceError('Only pending invites can be updated.', 400, 'INVITE_ALREADY_USED');
+  }
+
+  const existingInvite = await Invite.findOne({
+    targetEmail: email,
+    code: { $ne: code }
+  });
+
+  if (existingInvite) {
+    throw createServiceError('This email already has an invite.', 400, 'DUPLICATE_INVITE');
+  }
+
+  invite.targetEmail = email;
+  await invite.save();
+
+  return await exports.getInvitesByCreator(inviterUsername);
+};
+

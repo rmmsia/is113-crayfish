@@ -9,11 +9,12 @@ const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const inviteRoutes = require('./routes/invite');
 const postRoutes = require('./routes/post');
+const pagesRoutes = require('./routes/pages');
 
 const server = express();
 const port = process.env.PORT || 3000;
 const path = require("path");
-const { requireLogin } = require('./middleware/auth');
+const { setLocals, requireLogin } = require('./middleware/auth');
 
 // set environment variables from .env file
 require("dotenv").config();
@@ -27,6 +28,17 @@ server.use(
   })
 );
 
+// const Tag = require('./models/Tag');
+// const seedTags = async () => {
+//   const count = await Tag.countDocuments();
+//   if (count === 0) {
+//     await Tag.insertMany([
+//       { name: 'News' }, { name: 'Photography' }, { name: 'Help' }, { name: 'Discussion' },  { name: 'Art' }, { name: 'Memes' }, 
+//     ]);
+//   }
+// };
+// seedTags();
+
 server.set("view engine", "ejs")
 
 server.use("/", express.static(path.join(__dirname, "public")));
@@ -37,10 +49,12 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB Atlas'))
   .catch(err => console.log('Connection error: ', err));
 
+server.use(setLocals);
 server.use('/', authRoutes);
 server.use('/profile', requireLogin, profileRoutes);
 server.use('/invite', requireLogin, inviteRoutes);
 server.use('/posts', requireLogin, postRoutes);
+server.use('/', pagesRoutes);
 
 server.get("/", (req, res) => {
   if (req.session.userId) {

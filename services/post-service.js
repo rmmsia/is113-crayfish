@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Post = require('../models/Post');
 const Comment = require('../models/Comment');
+const Tag = require('../models/Tag');
 
 function createServiceError(message, status = 500, code = null) {
 	const error = new Error(message);
@@ -14,7 +15,7 @@ function createServiceError(message, status = 500, code = null) {
 }
 
 exports.getAllPosts = async (sort = 'new') => {
-	const posts = await Post.find();
+	const posts = await Post.find().populate('tags');
 
 	//Sort by upvotes
 	if (sort === 'top') {
@@ -39,17 +40,58 @@ exports.getAllPosts = async (sort = 'new') => {
 	return posts.sort((a, b) => b.createdAt - a.createdAt);
 };
 
-exports.createPost = async ({ title, imageURL, description, author }) => {
+exports.createPost = async ({ title, imageURL, description, author, tags }) => {
 	const post = new Post({
 		title,
 		imageURL,
 		description,
 		author,
+		tags: tags || [],
 		upvotes: [],
 		downvotes: []
 	});
 
 	return post.save();
+};
+
+exports.createTags = async({ names }) => {
+  const tagIds = []
+  
+  for (const name of names) {
+    //find tag
+    let tag = await Tag.findOne({ name });
+    if (!tag) tag = await Tag.create({ name });
+    tagIds.push(tag._id);
+  }
+
+  return tagIds;
+}
+
+exports.combineTags = async ({ existingTags, newTags }) => {
+  //normalise existing tags
+  let normalisedExistingTags = [] 
+  
+  if (existingTags) {
+    const existingTagsArray = Array.isArray(existingTags) ? existingTags : [existingTags];
+
+    normalisedExistingTags = existingTagsArray
+      .map((tagId) => String(tagId).trim())
+      .filter((tagId) => tagId.length > 0);
+  }
+  
+  //normalise new tags
+  let newTagsArray = []
+
+  if (typeof newTags === 'string') {
+    newTagsArray = newTags.split(",").map((tag) => tag.trim()).filter((tag) => tag.length > 0);
+  }
+
+  //save new tags
+  const newTagsIdArray = await exports.createTags({ names: newTagsArray });
+  const normalisedNewTagIds = newTagsIdArray.map((tagId) => String(tagId));
+
+  //prevent tag duplicates
+  return [...new Set([...normalisedExistingTags, ...normalisedNewTagIds])];
 };
 
 exports.upvotePost = async ({ userId, postId }) => {
@@ -116,7 +158,7 @@ exports.downvotePost = async({ userId, postId }) => {
 
 exports.addCommentToPost = async ({ postId, commentText, author }) => {
 	if (!mongoose.isValidObjectId(postId)) {
-		throw createServiceError('Post not found.', 404);
+		throw createServiceError('Invalid Post', 400);
 	}
 
 	const newComment = new Comment({
@@ -129,8 +171,7 @@ exports.addCommentToPost = async ({ postId, commentText, author }) => {
 
 	await Post.findByIdAndUpdate(
 		postId,
-		{ $push: { comments: savedComment._id } },
-		{ returnDocument: 'after' }
+		{ $push: { comments: savedComment._id } }
 	);
 
 	return savedComment;
@@ -138,7 +179,7 @@ exports.addCommentToPost = async ({ postId, commentText, author }) => {
 
 exports.deleteCommentFromPost = async ({ postId, commentId, username }) => {
 	if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
-		throw createServiceError("Comment doesn't exist", 404);
+		throw createServiceError("Invalid Post/Comment", 400);
 	}
 
 	const comment = await Comment.findById(commentId);
@@ -148,7 +189,7 @@ exports.deleteCommentFromPost = async ({ postId, commentId, username }) => {
 	}
 
 	if (username !== comment.author) {
-		throw createServiceError("Unauthorized to delete other users' comments", 404);
+		throw createServiceError("Unauthorized to delete other users' comments", 403);
 	}
 
 	await Comment.findByIdAndDelete(commentId);
@@ -159,11 +200,11 @@ exports.deleteCommentFromPost = async ({ postId, commentId, username }) => {
 
 exports.editCommentInPost = async ({ postId, commentId, updatedText, username }) => {
 	if (!mongoose.isValidObjectId(postId) || !mongoose.isValidObjectId(commentId)) {
-		throw createServiceError("Comment doesn't exist", 404);
+		throw createServiceError("Invalid Post/Comment", 400);
 	}
 
 	if (!updatedText) {
-		throw createServiceError("Comment doesn't exist", 404);
+		throw createServiceError("Comment text cannot be empty", 404);
 	}
 
 	const comment = await Comment.findById(commentId);
@@ -173,7 +214,7 @@ exports.editCommentInPost = async ({ postId, commentId, updatedText, username })
 	}
 
 	if (username !== comment.author) {
-		throw createServiceError("Unauthorized to edit other users' comments", 404);
+		throw createServiceError("Unauthorized to edit other users' comments", 403);
 	}
 
 	comment.text = updatedText;
@@ -182,12 +223,11 @@ exports.editCommentInPost = async ({ postId, commentId, updatedText, username })
 	return comment;
 };
 
-exports.getPostByIdWithComments = async ({ postId }) => {
+exports.getPost = async ({ postId }) => {
 	if (!mongoose.isValidObjectId(postId)) {
 		throw createServiceError('Post not found.', 404);
 	}
-
-	const post = await Post.findById(postId).populate('comments');
+	const post = await Post.findById(postId).populate('comments').populate('tags');
 
 	if (!post) {
 		throw createServiceError('Post not found.', 404);
@@ -196,7 +236,7 @@ exports.getPostByIdWithComments = async ({ postId }) => {
 	return post;
 };
 
-exports.updatePost = async ({ postId, title, imageURL, description, username }) => {
+exports.updatePost = async ({ postId, title, imageURL, description, username, tags }) => {
     const post = await Post.findById(postId);
     if (!post) throw createServiceError('Post not found', 404);
     
@@ -207,6 +247,7 @@ exports.updatePost = async ({ postId, title, imageURL, description, username }) 
     post.title = title;
     post.imageURL = imageURL;
     post.description = description;
+	  post.tags = tags || [];
     
     return await post.save();
 };
@@ -222,4 +263,31 @@ exports.deletePost = async ({ postId, username }) => {
     await Comment.deleteMany({ _id: { $in: post.comments } });
     
     return await Post.findByIdAndDelete(postId);
+};
+
+exports.getPopularTags = async () => {
+  const posts = await Post.find().populate('tags');
+
+  const tagCounts = {};
+
+  posts.forEach(post => {
+    post.tags.forEach(tag => {
+      const tagName = tag.name;
+      const tagId = tag._id;
+
+      if (tagCounts[tagId]) {
+        tagCounts[tagId].count++;
+      } else {
+        tagCounts[tagId] = {
+          tagDetails: { _id: tagId, name: tagName },
+          count: 1
+        };
+      }
+    });
+  });
+  const result = Object.values(tagCounts)
+    .sort((a, b) => b.count - a.count) 
+    .slice(0, 20);
+
+  return result;
 };
