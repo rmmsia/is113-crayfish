@@ -197,3 +197,14 @@ exports.displayEditPost = async (req, res) => {
   }
 };
 
+
+exports.displayPopularTags = async (req, res) => {
+  try {
+    const popularTags = await postService.getPopularTags(); 
+    
+    res.render("tags", { tags: popularTags });
+  } catch (err) {
+    sendError(res, err, "Error loading popular tags:");
+  }
+};
+
