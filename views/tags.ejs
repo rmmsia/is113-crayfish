@@ -7,8 +7,21 @@
 <body>
     <%- include('header') %>
     <main class="page-content">
-        <h1>Tags</h1>
-        <p>Tags page content coming soon.</p>
+    <h1>Popular Tags</h1>
+    <div class="tag-cloud" style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <% if (tags && tags.length > 0) { %>
+            <% tags.forEach(item => { %>
+                <div class="tag-card" style="padding: 10px 15px; background: #f0f0f0; border-radius: 20px; border: 1px solid #ddd;">
+                    <strong style="color: #333;">#<%= item.tagDetails.name %></strong>
+                    <span style="color: #666; font-size: 0.9em;">(<%= item.count %> posts)</span>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <p>No tags found yet.</p>
+        <% } %>
+    </div>
+</main>
+</main>
     </main>
     <%- include('footer') %>
 </body>

@@ -264,3 +264,30 @@ exports.deletePost = async ({ postId, username }) => {
     
     return await Post.findByIdAndDelete(postId);
 };
+
+exports.getPopularTags = async () => {
+  const posts = await Post.find().populate('tags');
+
+  const tagCounts = {};
+
+  posts.forEach(post => {
+    post.tags.forEach(tag => {
+      const tagName = tag.name;
+      const tagId = tag._id;
+
+      if (tagCounts[tagId]) {
+        tagCounts[tagId].count++;
+      } else {
+        tagCounts[tagId] = {
+          tagDetails: { _id: tagId, name: tagName },
+          count: 1
+        };
+      }
+    });
+  });
+  const result = Object.values(tagCounts)
+    .sort((a, b) => b.count - a.count) 
+    .slice(0, 20);
+
+  return result;
+};
