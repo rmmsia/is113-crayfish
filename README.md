@@ -48,6 +48,10 @@ This user registration flow will be based on the live MongoDB Atlas instance tha
     - Verification Code: `gz9ful0x`
 - Upon successful registration, you may log in using the username and the password that was just created.
 
+> Note: In the event of an **unsuccessful registration** with the above credentials for any reason, you may use the following login credentials as a fallback.
+> - Username: `is113_demo`
+> - Password: `is113_demo!`
+
 ### Bring Your Own MongoDB Instance
 This user registration flow will assume that you will not be using the live MongoDB Atlas instance, and you will instead **provide your own connection string**.
 
