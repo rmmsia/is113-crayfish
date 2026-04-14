@@ -1,33 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>User Tree</title>
-  <style>
-    pre {
-      font-family: monospace;
-      line-height: 1.2em;
-    }
-  </style>
+  <title>Crayfish: User Tree</title>
+  <link rel="stylesheet" href="/css/style.css" />
 </head>
 <body>
-  <h1>User Invite Tree</h1>
-  <pre>
-<pre>
-<% 
-function renderAscii(node, prefix = '', isLast = true, isRoot = false) { 
-%>
-<%= isRoot ? node.username : prefix + (isLast ? '└── ' : '├── ') + node.username %>
-<% 
-  if (node.children && node.children.length > 0) {
-    const newPrefix = prefix + (isLast ? '    ' : '│   ');
-    node.children.forEach((child, i) => {
-      renderAscii(child, newPrefix, i === node.children.length - 1);
-    });
-  }
-} 
-%>
+  <%- include('header') %>
+  <main class="page-content">
+    <h1>User Invite Tree</h1>
+    <div class="user-tree">
+      <%
+      function renderTree(node, prefix, isLast, isRoot) {
+        prefix = prefix || '';
+        isLast = isLast !== undefined ? isLast : true;
+        isRoot = isRoot || false;
 
-<% tree.forEach(root => { renderAscii(root, '', true, true); }) %>
-  </pre>
+        const connector = isRoot ? '' : (isLast ? '└── ' : '├── ');
+      %>
+        <div class="tree-node">
+          <span class="tree-prefix"><%= prefix %><%= connector %></span><a href="/profile/u/<%= node.username %>" class="tree-username"><%= node.username %></a> <span class="tree-karma">(<%= node.karma %>)</span>
+        </div>
+      <%
+        if (node.children && node.children.length > 0) {
+          const newPrefix = isRoot ? '' : prefix + (isLast ? '    ' : '│   ');
+          node.children.forEach(function(child, i) {
+            renderTree(child, newPrefix, i === node.children.length - 1, false);
+          });
+        }
+      }
+      %>
+
+      <% tree.forEach(function(root) { renderTree(root, '', true, true); }); %>
+    </div>
+  </main>
+  <%- include('footer') %>
 </body>
 </html>

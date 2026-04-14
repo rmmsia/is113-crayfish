@@ -391,3 +391,71 @@ button.post-ctrl-btn:hover {
   display: inline-block;
   margin-top: 0.75rem;
 }
+
+/* User Tree */
+.page-content {
+  padding: 1rem;
+}
+
+.user-tree {
+  font-family: monospace;
+  line-height: 1.6;
+}
+
+.tree-line {
+  white-space: nowrap;
+}
+
+.tree-prefix {
+  color: #666;
+}
+
+.tree-username {
+  color: #9dae00;
+  text-decoration: none;
+}
+
+.tree-username:hover {
+  text-decoration: underline;
+}
+
+.tree-karma {
+  color: #666;
+  font-size: 0.85em;
+  margin-left: 0.25rem;
+}
+
+/* User Tree */
+.user-tree {
+  font-family: monospace;
+  line-height: 1.6;
+  padding: 1rem;
+}
+
+.tree-line {
+  white-space: pre;
+}
+
+.tree-prefix {
+  color: #666;
+}
+
+.tree-username {
+  color: #9dae00;
+  text-decoration: none;
+}
+
+.tree-username:hover {
+  text-decoration: underline;
+}
+
+.tree-karma {
+  color: #666;
+  font-size: 0.9em;
+  margin-left: 0.25rem;
+}
+
+.tree-node {
+  white-space: pre-line;
+  line-height: 0.8;
+}
