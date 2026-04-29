@@ -1,9 +1,12 @@
 const dns = require('node:dns');
 dns.setServers(['1.1.1.1', '8.8.8.8']);
 
+require("dotenv").config();
+
 const express = require('express');
 const mongoose = require('mongoose');
 const session = require("express-session");
+const cors = require('cors');
 
 const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
@@ -11,46 +14,39 @@ const inviteRoutes = require('./routes/invite');
 const postRoutes = require('./routes/post');
 const userTreeRoutes = require('./routes/usertree');
 
+const { requireLogin } = require('./middleware/auth');
+
 const server = express();
 const port = process.env.PORT || 3000;
-const path = require("path");
-const { setLocals, requireLogin } = require('./middleware/auth');
 
-// set environment variables from .env file
-require("dotenv").config();
+server.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  credentials: true
+}));
 
-server.use(
-  session({
-    secret: process.env.SESSION_SECRET || "supersecretkey",
-    resave: false,
-    saveUninitialized: false,
-    cookie: { maxAge: 1000 * 60 * 60 * 24 } // 1 day
-  })
-);
+server.use(session({
+  secret: process.env.SESSION_SECRET || "supersecretkey",
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 1000 * 60 * 60 * 24 }
+}));
 
-server.set("view engine", "ejs")
-
-server.use("/", express.static(path.join(__dirname, "public")));
 server.use(express.json());
-server.use(express.urlencoded({ extended: true}));
+server.use(express.urlencoded({ extended: true }));
 
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Connected to MongoDB Atlas'))
+  .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.log('Connection error: ', err));
 
-server.use(setLocals);
-server.use('/', authRoutes);
+server.use('/auth', authRoutes);
 server.use('/profile', requireLogin, profileRoutes);
 server.use('/invite', requireLogin, inviteRoutes);
 server.use('/posts', requireLogin, postRoutes);
 server.use('/usertree', userTreeRoutes);
 
-server.get("/", (req, res) => {
-  if (req.session.userId) {
-    return res.redirect("/posts");
-  } else {
-    return res.redirect("/login");
-  }
+server.use((err, req, res, next) => {
+  console.error(err);
+  res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
 });
 
 server.listen(port, () => {
