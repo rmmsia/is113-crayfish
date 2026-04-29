@@ -9,7 +9,6 @@ const authRoutes = require('./routes/auth');
 const profileRoutes = require('./routes/profile');
 const inviteRoutes = require('./routes/invite');
 const postRoutes = require('./routes/post');
-const pagesRoutes = require('./routes/pages');
 const userTreeRoutes = require('./routes/usertree');
 
 const server = express();
@@ -44,7 +43,6 @@ server.use('/', authRoutes);
 server.use('/profile', requireLogin, profileRoutes);
 server.use('/invite', requireLogin, inviteRoutes);
 server.use('/posts', requireLogin, postRoutes);
-server.use('/', pagesRoutes);
 server.use('/usertree', userTreeRoutes);
 
 server.get("/", (req, res) => {
