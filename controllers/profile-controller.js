@@ -7,62 +7,42 @@ function sendError(res, err, context = null) {
     console.error(context, err);
   }
 
-  res.status(status).send(context + err.message);
+  res.status(status).json({ error: err.message });
 }
 
-exports.displayUserProfile = async (req , res) => {
+exports.getMyProfile = async (req, res) => {
   const user = req.user;
 
   try {
     const { posts, totalPosts, totalComments, totalKarma } = await profileService.getUserStats(user.username);
 
-    res.render("profile/profile", {
-      posts,
-      user,
-      totalKarma,
-      totalPosts,
-      totalComments,
-      isUser: true
-    });
+    res.json({ posts, user, totalKarma, totalPosts, totalComments });
   } catch (err) {
     sendError(res, err, 'Error retrieving profile: ');
   }
 }
 
-exports.visitOtherProfile = async (req, res) => {
+exports.getUserProfile = async (req, res) => {
   const { username } = req.params;
 
-  if (username === req.user.username) return res.redirect('/profile');
-  
-  try{
+  try {
     const user = await profileService.getUserByUsername(username);
     const { posts, totalPosts, totalComments, totalKarma } = await profileService.getUserStats(user.username);
 
-    res.render("profile/profile", {
-      posts,
-      user,
-      totalKarma,
-      totalPosts,
-      totalComments,
-      isUser: false
-    });
+    res.json({ posts, user, totalKarma, totalPosts, totalComments });
   } catch (err) {
     sendError(res, err, 'Error retrieving profile: ');
   }
 }
 
-exports.displayUpdateProfile = async (req, res) => {
-  res.render('profile/update-profile');
-}
-
-exports.submitUpdateProfile = async (req, res) => {
+exports.updateProfile = async (req, res) => {
   const { about } = req.body;
   const user = req.user;
 
   try {
     await profileService.updateUserAbout({ userId: user._id, about });
 
-    res.redirect('/profile');
+    res.json({ success: true });
   } catch (err) {
     sendError(res, err, 'Error updating profile: ');
   }
