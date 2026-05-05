@@ -23,7 +23,12 @@ exports.login = async (req, res) => {
   try {
     const user = await authService.loginUser({ username, password });
     req.session.userId = user._id;
-    res.json({ success: true });
+    
+    req.session.save(err => {
+      if (err) return res.status(500).json({ error: 'Session error' });
+      // Send the user object back so the frontend can update state immediately!
+      res.json({ success: true, user }); 
+    });
   } catch (err) {
     res.status(401).json({ error: err.message });
   }

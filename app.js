@@ -1,6 +1,8 @@
 const dns = require('node:dns');
 dns.setServers(['1.1.1.1', '8.8.8.8']);
 
+const User = require('./models/User');
+
 require("dotenv").config();
 
 const express = require('express');
@@ -20,16 +22,20 @@ const server = express();
 const port = process.env.PORT || 3000;
 
 server.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:5173',
+  origin: 'http://localhost:5173',
   credentials: true
-}));
+}))
 
 server.use(session({
   secret: process.env.SESSION_SECRET || "supersecretkey",
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 1000 * 60 * 60 * 24 }
-}));
+  cookie: {
+    maxAge: 1000 * 60 * 60 * 24,
+    sameSite: 'lax',
+    httpOnly: true
+  }
+}))
 
 server.use(express.json());
 server.use(express.urlencoded({ extended: true }));
@@ -37,6 +43,19 @@ server.use(express.urlencoded({ extended: true }));
 mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch(err => console.log('Connection error: ', err));
+
+server.use(async (req, res, next) => {
+  if (req.session && req.session.userId) {
+    try {
+      // Find the user in your database using the ID stored in the session
+      const user = await User.findById(req.session.userId); 
+      req.user = user; // Now req.user exists for your 'me' controller!
+    } catch (err) {
+      console.error("Session User Lookup Error:", err);
+    }
+  }
+  next();
+});
 
 server.use('/auth', authRoutes);
 server.use('/profile', requireLogin, profileRoutes);
