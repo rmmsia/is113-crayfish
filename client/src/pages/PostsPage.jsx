@@ -51,48 +51,72 @@ export default function PostsPage() {
 
   return (
     <main>
-      <nav>
+      {/* 1. Added className="site-nav" and active class logic */}
+      <nav className="site-nav">
         {SORT_OPTIONS.map(option => (
           <button
             key={option.value}
             onClick={() => setSearchParams({ sort: option.value })}
-            style={{ fontWeight: sort === option.value ? 'bold' : 'normal' }}
+            className={sort === option.value ? 'active' : ''}
           >
             {option.label}
           </button>
         ))}
       </nav>
 
-      <ol>
+      {/* 2. Added className="post-list" */}
+      <ol className="post-list">
         {posts.map((post, i) => {
           const score = (post.upvotes?.length || 0) - (post.downvotes?.length || 0)
-          const hasUpvoted = (post.upvotes || []).map(String).includes(String(user._id))
-          const hasDownvoted = (post.downvotes || []).map(String).includes(String(user._id))
+          const hasUpvoted = (post.upvotes || []).map(String).includes(String(user?._id))
+          const hasDownvoted = (post.downvotes || []).map(String).includes(String(user?._id))
 
           return (
-            <li key={post._id}>
-              <div>#{String(i + 1).padStart(2, '0')}</div>
+            <li className="post-card" key={post._id} data-id={post._id}>
+              {/* 3. Added className="rank" */}
+              <div className="rank"># {String(i + 1).padStart(2, '0')}</div>
 
-              <div>
-                <button onClick={() => handleVote(post._id, 'upvote')} disabled={hasUpvoted}>▲</button>
-                <span>{score}</span>
-                <button onClick={() => handleVote(post._id, 'downvote')} disabled={hasDownvoted}>▼</button>
+              {/* 4. Added className="voting-col" and vote-btn classes */}
+              <div className="voting-col">
+                <button 
+                  onClick={() => handleVote(post._id, 'upvote')} 
+                  disabled={hasUpvoted}
+                  className={`up vote-btn ${hasUpvoted ? 'voted-up' : ''}`}
+                  title="upvote"
+                >
+                  ▲
+                </button>
+                
+                <span className="score">{score}</span>
+                
+                <button 
+                  onClick={() => handleVote(post._id, 'downvote')} 
+                  disabled={hasDownvoted}
+                  className={`down vote-btn ${hasDownvoted ? 'voted-down' : ''}`}
+                  title="downvote"
+                >
+                  ▼
+                </button>
               </div>
 
               {post.imageURL && (
-                <Link to={`/posts/${post._id}`}>
-                  <img src={post.imageURL} alt={post.title} loading="lazy" />
+                <Link to={`/posts/${post._id}`} className="post-thumbnail-link">
+                  <img src={post.imageURL} className="post-thumbnail" alt={post.title} loading="lazy" />
                 </Link>
               )}
 
-              <div>
-                <Link to={`/posts/${post._id}`}>{post.title}</Link>
-                <div>
-                  <Link to={`/profile/${post.author}`}>@{post.author}</Link>
-                  <span> · </span>
-                  <span>{new Date(post.createdAt).toDateString()}</span>
-                  <span> · </span>
-                  <Link to={`/posts/${post._id}#comments`}>
+              {/* 5. Added className="post-body" and sub-classes */}
+              <div className="post-body">
+                <Link to={`/posts/${post._id}`} className="post-title">{post.title}</Link>
+                
+                <div className="post-sub">
+                  <span>
+                    <Link to={`/profile/${post.author}`} className="author">@{post.author}</Link>
+                  </span>
+                  <span className="dot">·</span>
+                  <span className="time">{new Date(post.createdAt).toDateString()}</span>
+                  <span className="dot">·</span>
+                  <Link to={`/posts/${post._id}#comments`} className="comments-link">
                     {post.comments.length} comment{post.comments.length === 1 ? '' : 's'}
                   </Link>
                 </div>

@@ -9,6 +9,7 @@ import RegisterPage from './pages/RegisterPage'
 import PostsPage from './pages/PostsPage'
 import ProfilePage from './pages/ProfilePage'
 import AboutPage from './pages/AboutPage'
+import InvitePage from './pages/InvitePage'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -37,6 +38,7 @@ export default function App() {
           } />
           <Route path="/profile/:username" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/about" element={<AboutPage />} />
+          <Route path="/invite" element={<ProtectedRoute><InvitePage /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/posts" replace />} />
         </Routes>
       </main>
