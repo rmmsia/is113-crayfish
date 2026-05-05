@@ -408,6 +408,7 @@ button.post-ctrl-btn:hover {
 
 .tree-prefix {
   color: #666;
+  white-space: pre;
 }
 
 .tree-username {
@@ -458,4 +459,5 @@ button.post-ctrl-btn:hover {
 .tree-node {
   white-space: pre-line;
   line-height: 0.8;
+  margin-bottom: 8px;
 }

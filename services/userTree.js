@@ -3,11 +3,8 @@ const Post = require('../models/Post');
 
 async function getUserTree() {
   const users = await User.find({}).lean();
-
-  // Fetch all posts to calculate karma
   const posts = await Post.find({}).lean();
 
-  // Calculate karma for each user
   const karmaMap = {};
   posts.forEach(post => {
     const karma = (post.upvotes?.length || 0) - (post.downvotes?.length || 0);
@@ -21,18 +18,17 @@ async function getUserTree() {
     userMap[u.username] = u;
   });
 
-  let root = null;
+  const roots = []; // Change from a single variable to an array
 
   users.forEach(u => {
-    if (u.invitedBy) {
-      const parent = userMap[u.invitedBy];
-      if (parent) parent.children.push(u);
+    if (u.invitedBy && userMap[u.invitedBy]) {
+      userMap[u.invitedBy].children.push(u);
     } else {
-      root = u;
+      roots.push(u); // Anyone without a valid parent is a root
     }
   });
 
-  return root ? [root] : [];
+  return roots;
 }
 
 module.exports = { getUserTree };
