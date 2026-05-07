@@ -11,6 +11,8 @@ import ProfilePage from './pages/ProfilePage'
 import AboutPage from './pages/AboutPage'
 import InvitePage from './pages/InvitePage'
 import UserTreePage from './pages/UserTreePage'
+import CreatePostPage from './pages/CreatePostPage'
+import PostDetailPage from './pages/PostDetailPage'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -41,6 +43,9 @@ export default function App() {
           <Route path="/about" element={<AboutPage />} />
           <Route path="/invite" element={<ProtectedRoute><InvitePage /></ProtectedRoute>} />
           <Route path="/usertree" element={<UserTreePage />} />
+          <Route path="/posts/create" element={<ProtectedRoute><CreatePostPage /></ProtectedRoute>} />
+          <Route path="/posts/:postId/edit" element={<ProtectedRoute><CreatePostPage /></ProtectedRoute>} />
+          <Route path="/posts/:postId" element={<ProtectedRoute><PostDetailPage /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/posts" replace />} />
         </Routes>
       </main>
