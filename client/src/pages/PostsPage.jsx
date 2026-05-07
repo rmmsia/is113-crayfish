@@ -35,16 +35,57 @@ export default function PostsPage() {
   }, [sort])
 
   async function handleVote(postId, direction) {
-    await fetch(`http://localhost:3000/posts/${postId}/${direction}`, {
+  if (!user) return; // Guard against logged-out users
+
+  // 1. OPTIMISTIC UPDATE: Update UI immediately
+  setPosts(currentPosts => currentPosts.map(post => {
+    if (post._id !== postId) return post;
+
+    // Create copies of the vote arrays
+    let upvotes = [...(post.upvotes || [])].map(String);
+    let downvotes = [...(post.downvotes || [])].map(String);
+    const userId = String(user._id);
+
+    if (direction === 'upvote') {
+      if (upvotes.includes(userId)) {
+        // RETRACT: User is upvoting a post they already upvoted
+        upvotes = upvotes.filter(id => id !== userId);
+      } else {
+        // VOTE: Add to upvotes, remove from downvotes
+        upvotes.push(userId);
+        downvotes = downvotes.filter(id => id !== userId);
+      }
+    } else {
+      if (downvotes.includes(userId)) {
+        // RETRACT: User is downvoting a post they already downvoted
+        downvotes = downvotes.filter(id => id !== userId);
+      } else {
+        // VOTE: Add to downvotes, remove from upvotes
+        downvotes.push(userId);
+        upvotes = upvotes.filter(id => id !== userId);
+      }
+    }
+
+    return { ...post, upvotes, downvotes };
+  }));
+
+  // 2. BACKEND CALL: Run in the background
+  try {
+    const res = await fetch(`http://localhost:3000/posts/${postId}/${direction}`, {
       method: 'POST',
       credentials: 'include'
-    })
-    const res = await fetch(`http://localhost:3000/posts?sort=${sort}`, {
-      credentials: 'include'
-    })
-    const data = await res.json()
-    setPosts(data.posts)
+    });
+    
+    if (!res.ok) throw new Error('Vote failed');
+  } catch (err) {
+    // 3. ROLLBACK (Optional): If the server fails, you could re-fetch 
+    // the list here to sync the UI back to reality.
+    console.error("Voting failed, syncing state...");
+    const syncRes = await fetch(`http://localhost:3000/posts?sort=${sort}`, { credentials: 'include' });
+    const data = await syncRes.json();
+    setPosts(data.posts);
   }
+}
 
   if (loading) return <p>Loading...</p>
   if (error) return <p>{error}</p>
@@ -80,7 +121,7 @@ export default function PostsPage() {
               <div className="voting-col">
                 <button 
                   onClick={() => handleVote(post._id, 'upvote')} 
-                  disabled={hasUpvoted}
+                  // disabled={hasUpvoted}
                   className={`up vote-btn ${hasUpvoted ? 'voted-up' : ''}`}
                   title="upvote"
                 >
@@ -91,7 +132,7 @@ export default function PostsPage() {
                 
                 <button 
                   onClick={() => handleVote(post._id, 'downvote')} 
-                  disabled={hasDownvoted}
+                  // disabled={hasDownvoted}
                   className={`down vote-btn ${hasDownvoted ? 'voted-down' : ''}`}
                   title="downvote"
                 >

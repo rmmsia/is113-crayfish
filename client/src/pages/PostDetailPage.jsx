@@ -22,9 +22,51 @@ export default function PostDetailPage() {
   }
 
   const handleVote = async (direction) => {
-    await fetch(`http://localhost:3000/posts/${id}/${direction}`, { method: 'POST', credentials: 'include' })
-    fetchPost()
+  if (!user || !post) return;
+
+  // 1. OPTIMISTIC UPDATE: Update the single post object immediately
+  setPost(prevPost => {
+    let upvotes = [...(prevPost.upvotes || [])].map(String);
+    let downvotes = [...(prevPost.downvotes || [])].map(String);
+    const userId = String(user._id);
+
+    if (direction === 'upvote') {
+      if (upvotes.includes(userId)) {
+        // RETRACT
+        upvotes = upvotes.filter(id => id !== userId);
+      } else {
+        // VOTE
+        upvotes.push(userId);
+        downvotes = downvotes.filter(id => id !== userId);
+      }
+    } else {
+      if (downvotes.includes(userId)) {
+        // RETRACT
+        downvotes = downvotes.filter(id => id !== userId);
+      } else {
+        // VOTE
+        downvotes.push(userId);
+        upvotes = upvotes.filter(id => id !== userId);
+      }
+    }
+
+    return { ...prevPost, upvotes, downvotes };
+  });
+
+  // 2. BACKEND CALL: Fire and forget (mostly)
+  try {
+    const res = await fetch(`http://localhost:3000/posts/${id}/${direction}`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+    
+    if (!res.ok) throw new Error('Server error');
+  } catch (err) {
+    // 3. ROLLBACK: If the server barfs, sync back to the source of truth
+    console.error("Vote failed, reverting UI...");
+    fetchPost(); 
   }
+};
 
   const handleAddComment = async (e) => {
     e.preventDefault()
