@@ -10,31 +10,21 @@ const handledErrors = [
 
 function sendError(res, err, context = null) {
   const status = err.status || 500;
-
-  if (status >= 500 && context) {
-    console.error(context, err);
-  }
-
-  res.status(status).send(context + err.message);
+  if (status >= 500 && context) console.error(context, err);
+  res.status(status).json({ error: err.message });
 }
 
-exports.displayInvitePage = async (req, res) => {
+exports.getInvites = async (req, res) => {
   try {
     const inviteList = await inviteService.getInvitesByCreator(req.user.username);
-
-    res.render('invitation', {
-      invite: null,
-      email: null,
-      error: null,
-      inviteList
-    });
+    res.json({ inviteList });
   } catch (err) {
-    sendError(res, err, 'Error retrieving invites: ')
+    sendError(res, err, 'Error retrieving invites: ');
   }
 };
 
 exports.generateInvitation = async (req, res) => {
-  const email = req.body.email;
+  const { email } = req.body;
 
   try {
     const { invite, inviteList } = await inviteService.generateInvitation({
@@ -43,62 +33,36 @@ exports.generateInvitation = async (req, res) => {
       inviterEmail: req.user.email
     });
 
-    res.render('invitation', {
-      invite,
-      error: null,
-      email,
-      inviteList
-    });
+    res.status(201).json({ invite, inviteList });
   } catch (err) {
     if (handledErrors.includes(err.code)) {
-      const inviteList = await inviteService.getInvitesByCreator(req.user.username);
-
-      return res.render('invitation', {
-        error: err.message,
-        email,
-        invite: null,
-        inviteList
-      });
+      return res.status(400).json({ error: err.message, code: err.code });
     }
-
     sendError(res, err, 'Error generating invite: ');
   }
 };
 
-exports.retractInvitation = async (req,res) => {
-  const code = req.body.code; 
+exports.retractInvitation = async (req, res) => {
+  const { code } = req.params;
 
   try {
     const inviteList = await inviteService.retractInvitation({
       code,
       inviterUsername: req.user.username
-    })
-
-    res.render('invitation', {
-      invite: null,
-      email: null,
-      error: null,
-      inviteList
     });
+
+    res.json({ inviteList });
   } catch (err) {
-    if(handledErrors.includes(err.code)){
-      const inviteList = await inviteService.getInvitesByCreator(req.user.username);
-
-      return res.render('invitation', {
-        invite: null,
-        email: null,
-        error: err.message,
-        inviteList
-      });
+    if (handledErrors.includes(err.code)) {
+      return res.status(400).json({ error: err.message, code: err.code });
     }
-
     sendError(res, err, 'Error retracting invite: ');
   }
 };
 
 exports.updateInvitation = async (req, res) => {
-  const code = req.body.code;
-  const email = req.body.email;
+  const { code } = req.params;
+  const { email } = req.body;
 
   try {
     const inviteList = await inviteService.updateInvitation({
@@ -108,24 +72,11 @@ exports.updateInvitation = async (req, res) => {
       inviterEmail: req.user.email
     });
 
-    res.render('invitation', {
-      invite: null,
-      email: null,
-      error: null,
-      inviteList
-    });
+    res.json({ inviteList });
   } catch (err) {
-      const inviteList = await inviteService.getInvitesByCreator(req.user.username);
-
-      if (handledErrors.includes(err.code)) {
-        return res.render('invitation', {
-          invite: null,
-          email: null,
-          error: err.message,
-          inviteList
-        });
-      }
-
-      sendError(res, err, 'Error updating invite: ');
+    if (handledErrors.includes(err.code)) {
+      return res.status(400).json({ error: err.message, code: err.code });
+    }
+    sendError(res, err, 'Error updating invite: ');
   }
 };
