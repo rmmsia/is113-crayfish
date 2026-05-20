@@ -3,208 +3,119 @@ const Tag = require('../models/Tag');
 
 function sendError(res, err, context = null) {
   const status = err.status || 500;
-
-  if (status >= 500 && context) {
-    console.error(context, err);
-  }
-
-  res.status(status).send(context + err.message);
+  if (status >= 500 && context) console.error(context, err);
+  res.status(status).json({ error: err.message });
 }
 
-exports.displayPosts = async (req, res) => {
+exports.getPosts = async (req, res) => {
   try {
     const sort = req.query.sort || 'new';
     const posts = await postService.getAllPosts(sort);
-    const userId = req.user._id;
-    const route = req.originalUrl
-    //console.log(route);
-
-    res.render('home', { posts, sort, userId, route });
+    res.json({ posts, sort });
   } catch (err) {
-    sendError(res, err, 'Error rendering /home:');
+    sendError(res, err, 'Error fetching posts:');
   }
 };
 
-exports.upvotePost = async (req, res) => {
-  const { id } = req.params;
-  const { route } = req.body;
-  const userId = req.user._id;
-
+exports.getPost = async (req, res) => {
   try {
-    await postService.upvotePost({ userId, postId: id });
-
-    res.redirect(route);
+    const post = await postService.getPost({ postId: req.params.id });
+    res.json({ post });
   } catch (err) {
-    sendError(res, err)
+    sendError(res, err, 'Error fetching post:');
   }
-}
+};
 
-exports.downvotePost = async (req, res) => {
-  const { id } = req.params;
-  const { route } = req.body;
-  const userId = req.user._id;
-
-  try {
-    await postService.downvotePost({ userId, postId: id });
-
-    res.redirect(route);
-  } catch (err) {
-    sendError(res,err)
-  }
-}
-
-exports.displayCreatePost = async (req, res) => {
+exports.getTags = async (req, res) => {
   try {
     const tags = await Tag.find({}) || [];
-    res.render('posts/create-post', {
-      tags
-    });
+    res.json({ tags });
   } catch (err) {
-    sendError(res, err, 'Error displaying create page:');
+    sendError(res, err, 'Error fetching tags:');
+  }
+};
+
+exports.getPopularTags = async (req, res) => {
+  try {
+    const tags = await postService.getPopularTags();
+    res.json({ tags });
+  } catch (err) {
+    sendError(res, err, 'Error fetching popular tags:');
   }
 };
 
 exports.createPost = async (req, res) => {
   try {
     const { title, imageURL, description, existingTags, newTags } = req.body;
-
     const allTags = await postService.combineTags({ existingTags, newTags });
-
-    //create post
-    await postService.createPost({
-      title,
-      imageURL,
-      description,
-      author: req.user.username,
-      tags: allTags
-    });
-
-    res.redirect('/posts');
+    await postService.createPost({ title, imageURL, description, author: req.user.username, tags: allTags });
+    res.status(201).json({ success: true });
   } catch (err) {
     sendError(res, err, 'Error creating post:');
   }
 };
 
-exports.addComment = async (req, res) => {
-  const commentText = req.body.add_comment;
-  const author = req.user.username;
-  const { id } = req.params;
-
+exports.editPost = async (req, res) => {
   try {
-    await postService.addCommentToPost({
-      postId: id,
-      commentText,
-      author
-    });
+    const { title, imageURL, description, existingTags, newTags } = req.body;
+    const allTags = await postService.combineTags({ existingTags, newTags });
+    await postService.updatePost({ postId: req.params.id, title, imageURL, description, username: req.user.username, tags: allTags });
+    res.json({ success: true });
+  } catch (err) {
+    sendError(res, err, 'Error updating post:');
+  }
+};
 
-    res.redirect(`/posts/${id}`);
+exports.deletePost = async (req, res) => {
+  try {
+    await postService.deletePost({ postId: req.params.id, username: req.user.username });
+    res.json({ success: true });
+  } catch (err) {
+    sendError(res, err, 'Error deleting post:');
+  }
+};
+
+exports.upvotePost = async (req, res) => {
+  try {
+    await postService.upvotePost({ userId: req.user._id, postId: req.params.id });
+    res.json({ success: true });
+  } catch (err) {
+    sendError(res, err);
+  }
+};
+
+exports.downvotePost = async (req, res) => {
+  try {
+    await postService.downvotePost({ userId: req.user._id, postId: req.params.id });
+    res.json({ success: true });
+  } catch (err) {
+    sendError(res, err);
+  }
+};
+
+exports.addComment = async (req, res) => {
+  try {
+    await postService.addCommentToPost({ postId: req.params.id, commentText: req.body.commentText, author: req.user.username });
+    res.status(201).json({ success: true });
   } catch (err) {
     sendError(res, err, 'Error adding comment:');
   }
 };
 
 exports.deleteComment = async (req, res) => {
-  const { postId, commentId } = req.params;
-  const user = req.user.username;
-
   try {
-    await postService.deleteCommentFromPost({
-      postId,
-      commentId,
-      username: user
-    });
-
-    res.redirect(`/posts/${postId}`);
+    await postService.deleteCommentFromPost({ postId: req.params.postId, commentId: req.params.commentId, username: req.user.username });
+    res.json({ success: true });
   } catch (err) {
     sendError(res, err, 'Error deleting comment:');
   }
 };
 
 exports.editComment = async (req, res) => {
-  const { postId, commentId } = req.params;
-  const updatedText = req.body.updated_comment;
-  const user = req.user.username;
-
   try {
-    await postService.editCommentInPost({
-      postId,
-      commentId,
-      updatedText,
-      username: user
-    });
-
-    res.redirect(`/posts/${postId}`);
+    await postService.editCommentInPost({ postId: req.params.postId, commentId: req.params.commentId, updatedText: req.body.updatedText, username: req.user.username });
+    res.json({ success: true });
   } catch (err) {
     sendError(res, err, 'Error editing comment:');
   }
 };
-
-exports.displayPost = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const post = await postService.getPost({ postId: id });
-    res.render('posts/post', { post });
-  } catch (err) {
-    sendError(res, err, 'Error displaying post:');
-  }
-};
-
-exports.editPost = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { title, imageURL, description, existingTags, newTags } = req.body;
-        const username = req.user.username;
-
-        const allTags = await postService.combineTags({ existingTags, newTags });
-
-        await postService.updatePost({
-            postId: id,
-            title,
-            imageURL,
-            description,
-            username,
-            tags: allTags
-        });
-
-        res.redirect(`/posts/${id}`);
-    } catch (err) {
-        sendError(res, err, 'Error updating post:');
-    }
-};
-
-exports.deletePost = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const username = req.user.username;
-
-        await postService.deletePost({ postId: id, username });
-
-        res.redirect('/posts');
-    } catch (err) {
-        sendError(res, err, 'Error deleting post:');
-    }
-};
-
-exports.displayEditPost = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const post = await postService.getPost({ postId: id });
-    const tags = await Tag.find();
-
-    res.render('posts/edit-post', { post, tags }); 
-  } catch (err) {
-    sendError(res, err, 'Error displaying edit page:');
-  }
-};
-
-
-exports.displayPopularTags = async (req, res) => {
-  try {
-    const popularTags = await postService.getPopularTags(); 
-    
-    res.render("tags", { tags: popularTags });
-  } catch (err) {
-    sendError(res, err, "Error loading popular tags:");
-  }
-};
-

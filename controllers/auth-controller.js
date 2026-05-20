@@ -2,110 +2,72 @@ const authService = require("../services/auth-service");
 
 function sendError(res, err, context = null) {
   const status = err.status || 500;
-
-  if (status >= 500 && context) {
-    console.error(context, err);
-  }
-
-  res.status(status).send(context + err.message);
+  if (status >= 500 && context) console.error(context, err);
+  res.status(status).json({ error: err.message });
 }
 
-exports.registerGet = (req, res) => {
-  res.render("auth/register", { errors: null, formData: null });
-};
-
-exports.registerPost = async (req, res) => {
+exports.register = async (req, res) => {
   const { username, email, password, inviter, vcode } = req.body;
 
   try {
     await authService.registerUser({ username, email, password, inviter, vcode });
-    res.redirect("/register-success");
+    res.status(201).json({ success: true });
   } catch (err) {
-    res.render('auth/register', {
-      errors: err.errors || [err.message],
-      formData: { username, email, password, inviter, vcode }
-    });
+    res.status(400).json({ errors: err.errors || [err.message] });
   }
 };
 
-exports.registerSuccess = async (req, res) => {
-  res.render("auth/register-success")
-}
-
-exports.loginGet = (req, res) => {
-  res.render("auth/login", { error: null });
-};
-
-exports.loginPost = async (req, res) => {
+exports.login = async (req, res) => {
   const { username, password } = req.body;
-  
+
   try {
     const user = await authService.loginUser({ username, password });
-
     req.session.userId = user._id;
-
-    res.redirect("/posts");
+    
+    req.session.save(err => {
+      if (err) return res.status(500).json({ error: 'Session error' });
+      // Send the user object back so the frontend can update state immediately!
+      res.json({ success: true, user }); 
+    });
   } catch (err) {
-    res.render("auth/login", { error: err.message });
+    res.status(401).json({ error: err.message });
   }
 };
 
-exports.processLogout = (req, res) => {
+exports.logout = (req, res) => {
   req.session.destroy((err) => {
-    if (err) {
-      return sendError(res, err, 'Could not log out. Please try again.');
-    }
+    if (err) return sendError(res, err, 'Could not log out.');
     res.clearCookie("connect.sid");
-    res.redirect("/login");
+    res.json({ success: true });
   });
 };
 
-exports.forgotPasswordGet = async (req, res) => {
-  res.render("auth/forgot-password", { error: null, resetLink: null, email: null });
-}
+exports.me = (req, res) => {
+  if (!req.user) return res.status(401).json({ error: 'Not authenticated' });
+  res.json({ user: req.user });
+};
 
-exports.forgotPasswordPost = async (req, res) => {
+exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
 
   try {
     const token = await authService.generateResetPasswordToken({ email });
-
     const baseUrl = process.env.BASE_URL || "http://localhost:3000";
     const resetLink = `${baseUrl}/reset-password?token=${token}`;
-
-    res.render("auth/forgot-password", { resetLink, email, error: null });
+    res.json({ resetLink, email });
   } catch (err) {
-
-    res.render("auth/forgot-password", { resetLink: null, error: err.message, email });
+    res.status(400).json({ error: err.message });
   }
-}
+};
 
-exports.resetPasswordGet = async (req, res) => {  
-  const { token } = req.query;
-
-  res.render('auth/reset-password', { token, password: null, errors: null });
-}
-
-exports.resetPasswordPost = async (req, res) => {
+exports.resetPassword = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
 
   try {
-    await authService.resetPassword({
-      token,
-      newPassword: password
-    });
-
-    res.redirect('/reset-success');
+    await authService.resetPassword({ token, newPassword: password });
+    res.json({ success: true });
   } catch (err) {
-    res.render('auth/reset-password', { 
-      token, 
-      password,
-      errors: err.errors || [err.message]
-    })
+    res.status(400).json({ errors: err.errors || [err.message] });
   }
-}
-
-exports.resetSuccess = async (req, res) => {
-  res.render('auth/reset-success');
-}
+};
