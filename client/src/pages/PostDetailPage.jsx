@@ -16,7 +16,7 @@ export default function PostDetailPage() {
   }, [id])
 
   const fetchPost = async () => {
-    const res = await fetch(`http://localhost:3000/posts/${id}`, { credentials: 'include' })
+    const res = await fetch(`/posts/${id}`, { credentials: 'include' })
     const data = await res.json()
     if (res.ok) setPost(data.post)
   }
@@ -55,7 +55,7 @@ export default function PostDetailPage() {
 
   // 2. BACKEND CALL: Fire and forget (mostly)
   try {
-    const res = await fetch(`http://localhost:3000/posts/${id}/${direction}`, {
+    const res = await fetch(`/posts/${id}/${direction}`, {
       method: 'POST',
       credentials: 'include'
     });
@@ -70,7 +70,7 @@ export default function PostDetailPage() {
 
   const handleAddComment = async (e) => {
     e.preventDefault()
-    const res = await fetch(`http://localhost:3000/posts/${id}/comments`, {
+    const res = await fetch(`/posts/${id}/comments`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ commentText: newComment }),
@@ -84,12 +84,12 @@ export default function PostDetailPage() {
 
   const handleDeleteComment = async (commentId) => {
     if (!window.confirm("Delete this comment?")) return
-    await fetch(`http://localhost:3000/posts/${id}/comments/${commentId}`, { method: 'DELETE', credentials: 'include' })
+    await fetch(`/posts/${id}/comments/${commentId}`, { method: 'DELETE', credentials: 'include' })
     fetchPost()
   }
 
   const handleUpdateComment = async (commentId) => {
-    await fetch(`http://localhost:3000/posts/${id}/comments/${commentId}`, {
+    await fetch(`/posts/${id}/comments/${commentId}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ updatedText: editCommentText }),
@@ -101,7 +101,7 @@ export default function PostDetailPage() {
 
   const handleDeletePost = async () => {
     if (!window.confirm("Delete this entire post?")) return
-    await fetch(`http://localhost:3000/posts/${id}`, { method: 'DELETE', credentials: 'include' })
+    await fetch(`/posts/${id}`, { method: 'DELETE', credentials: 'include' })
     navigate('/posts')
   }
 

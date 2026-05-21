@@ -16,7 +16,7 @@ export default function InvitePage() {
 
   const fetchInvites = async () => {
     try {
-      const res = await fetch('http://localhost:3000/invite', { credentials: 'include' })
+      const res = await fetch('/invite', { credentials: 'include' })
       const data = await res.json()
       if (res.ok) setInviteList(data.inviteList)
     } catch (err) {
@@ -30,7 +30,7 @@ export default function InvitePage() {
     e.preventDefault()
     setError(null)
     try {
-      const res = await fetch('http://localhost:3000/invite', {
+      const res = await fetch('/invite', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -51,7 +51,7 @@ export default function InvitePage() {
     if (!newEmail) return
 
     try {
-      const res = await fetch(`http://localhost:3000/invite/${code}`, {
+      const res = await fetch(`/invite/${code}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: newEmail }),
@@ -72,7 +72,7 @@ export default function InvitePage() {
     if (!window.confirm("Are you sure you want to retract this invite?")) return
 
     try {
-      const res = await fetch(`http://localhost:3000/invite/${code}`, {
+      const res = await fetch(`/invite/${code}`, {
         method: 'DELETE',
         credentials: 'include'
       })
