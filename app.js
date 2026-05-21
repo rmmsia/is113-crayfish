@@ -3,7 +3,9 @@ dns.setServers(['1.1.1.1', '8.8.8.8']);
 
 const User = require('./models/User');
 
-require("dotenv").config();
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV || 'development'}`
+});
 
 const express = require('express');
 const mongoose = require('mongoose');
