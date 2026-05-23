@@ -1,0 +1,8 @@
+services:
+  app:
+    image: ghcr.io/rmmsia/is113/crayfish:latest
+    restart: unless-stopped
+    env_file:
+      - .env.production
+    ports:
+      - "3001:3000"

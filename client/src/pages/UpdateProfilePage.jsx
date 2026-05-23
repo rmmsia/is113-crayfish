@@ -11,7 +11,7 @@ export default function UpdateProfilePage() {
 
   useEffect(() => {
     // Fetch current profile data to fill the textarea
-    fetch('http://localhost:3000/profile/me', { credentials: 'include' })
+    fetch('/profile/me', { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (data.user) {
@@ -27,7 +27,7 @@ export default function UpdateProfilePage() {
     setSaving(true)
 
     try {
-      const res = await fetch('http://localhost:3000/profile/update', {
+      const res = await fetch('/profile/update', {
         method: 'PATCH', // Matches your backend route
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ about }),
