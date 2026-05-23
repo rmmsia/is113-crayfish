@@ -14,6 +14,7 @@ import UserTreePage from './pages/UserTreePage'
 import CreatePostPage from './pages/CreatePostPage'
 import PostDetailPage from './pages/PostDetailPage'
 import UpdateProfilePage from './pages/UpdateProfilePage'
+import './App.css'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
