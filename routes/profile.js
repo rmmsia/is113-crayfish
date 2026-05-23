@@ -5,9 +5,10 @@ const {
   getUserProfile,
   updateProfile,
 } = require("../controllers/profile-controller");
+const { requireLogin } = require('../middleware/auth');
 
-router.get("/me", getMyProfile);
+router.get("/me", requireLogin, getMyProfile);
 router.get("/:username", getUserProfile);
-router.patch("/update", updateProfile);
+router.patch("/update", requireLogin, updateProfile);
 
 module.exports = router;
