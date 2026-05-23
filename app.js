@@ -60,7 +60,7 @@ server.use(async (req, res, next) => {
 });
 
 server.use('/auth', authRoutes);
-server.use('/profile', requireLogin, profileRoutes);
+server.use('/profile', profileRoutes);
 server.use('/invite', requireLogin, inviteRoutes);
 server.use('/posts', postRoutes);
 server.use('/usertree', userTreeRoutes);

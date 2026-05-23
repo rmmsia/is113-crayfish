@@ -35,7 +35,7 @@ export default function App() {
           <Route path="/posts/:postId" element={<PostDetailPage />} />
           <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/profile/update" element={<ProtectedRoute><UpdateProfilePage /></ProtectedRoute>} />
-          <Route path="/profile/:username" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/profile/:username" element={<ProfilePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/invite" element={<ProtectedRoute><InvitePage /></ProtectedRoute>} />
           <Route path="/usertree" element={<UserTreePage />} />
