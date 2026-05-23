@@ -45,7 +45,7 @@ export default function UserTreePage() {
 
   useEffect(() => {
     // Fetch the JSON from the backend route we just updated
-    fetch('http://localhost:3000/usertree', { credentials: 'include' })
+    fetch('/usertree', { credentials: 'include' })
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch user tree')
         return res.json()

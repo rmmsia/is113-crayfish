@@ -27,7 +27,7 @@ export default function LoginPage() {
   setError(null)
 
   try {
-    const res = await fetch('http://localhost:3000/auth/login', {
+    const res = await fetch('/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -56,7 +56,7 @@ export default function LoginPage() {
 
     // If no user data in login response, try /auth/me
     try {
-      const meRes = await fetch('http://localhost:3000/auth/me', {
+      const meRes = await fetch('/auth/me', {
         credentials: 'include'
       })
       const meData = meRes.ok ? await meRes.json() : null

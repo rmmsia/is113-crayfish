@@ -20,7 +20,7 @@ export default function PostsPage() {
 
   useEffect(() => {
     setLoading(true)
-    fetch(`http://localhost:3000/posts?sort=${sort}`, {
+    fetch(`/posts?sort=${sort}`, {
       credentials: 'include'
     })
       .then(res => res.json())
@@ -71,7 +71,7 @@ export default function PostsPage() {
 
   // 2. BACKEND CALL: Run in the background
   try {
-    const res = await fetch(`http://localhost:3000/posts/${postId}/${direction}`, {
+    const res = await fetch(`/posts/${postId}/${direction}`, {
       method: 'POST',
       credentials: 'include'
     });
@@ -81,7 +81,7 @@ export default function PostsPage() {
     // 3. ROLLBACK (Optional): If the server fails, you could re-fetch 
     // the list here to sync the UI back to reality.
     console.error("Voting failed, syncing state...");
-    const syncRes = await fetch(`http://localhost:3000/posts?sort=${sort}`, { credentials: 'include' });
+    const syncRes = await fetch(`/posts?sort=${sort}`, { credentials: 'include' });
     const data = await syncRes.json();
     setPosts(data.posts);
   }

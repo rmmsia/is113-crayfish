@@ -10,14 +10,14 @@ export default function CreatePostPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    fetch('http://localhost:3000/posts/tags/all', { credentials: 'include' })
+    fetch('/posts/tags/all', { credentials: 'include' })
       .then(res => res.json())
       .then(data => setAvailableTags(data.tags || []))
   }, [])
 
   useEffect(() => {
     if (!isEdit) return
-    fetch(`http://localhost:3000/posts/${postId}`, { credentials: 'include' })
+    fetch(`/posts/${postId}`, { credentials: 'include' })
       .then(res => res.json())
       .then(data => {
         if (!data.post) return
@@ -43,7 +43,7 @@ export default function CreatePostPage() {
     e.preventDefault()
     if (!imgValid) return alert("Invalid image URL")
 
-    const url = isEdit ? `http://localhost:3000/posts/${postId}` : 'http://localhost:3000/posts'
+    const url = isEdit ? `/posts/${postId}` : '/posts'
     const method = isEdit ? 'PATCH' : 'POST'
 
     const res = await fetch(url, {
