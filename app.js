@@ -1,6 +1,7 @@
 const dns = require('node:dns');
 dns.setServers(['1.1.1.1', '8.8.8.8']);
 
+const path = require('path');
 const User = require('./models/User');
 
 require('dotenv').config({
@@ -49,9 +50,8 @@ mongoose.connect(process.env.MONGO_URI)
 server.use(async (req, res, next) => {
   if (req.session && req.session.userId) {
     try {
-      // Find the user in your database using the ID stored in the session
       const user = await User.findById(req.session.userId); 
-      req.user = user; // Now req.user exists for your 'me' controller!
+      req.user = user;
     } catch (err) {
       console.error("Session User Lookup Error:", err);
     }
@@ -69,6 +69,14 @@ server.use((err, req, res, next) => {
   console.error(err);
   res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
 });
+
+// Static files and catch-all — production only, after all API routes
+if (process.env.NODE_ENV === 'production') {
+  server.use(express.static(path.join(__dirname, 'client/dist')));
+  server.get('/{*path}', (req, res) => {
+    res.sendFile(path.join(__dirname, 'client/dist', 'index.html'));
+  });
+}
 
 server.listen(port, () => {
   console.log(`Server is running on port ${port}`);
