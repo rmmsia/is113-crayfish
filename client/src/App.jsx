@@ -14,6 +14,7 @@ import UserTreePage from './pages/UserTreePage'
 import CreatePostPage from './pages/CreatePostPage'
 import PostDetailPage from './pages/PostDetailPage'
 import UpdateProfilePage from './pages/UpdateProfilePage'
+import './App.css'
 
 function ProtectedRoute({ children }) {
   const { user, loading } = useAuth()
@@ -28,26 +29,19 @@ export default function App() {
       
       <main className="main-content">
         <Routes>
+          <Route path="/" element={<PostsPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/posts" element={
-            <ProtectedRoute>
-              <PostsPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/profile" element={
-            <ProtectedRoute>
-              <ProfilePage />
-            </ProtectedRoute>
-          } />
+          <Route path="/posts" element={<Navigate to="/" replace />} />
+          <Route path="/posts/:postId" element={<PostDetailPage />} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
           <Route path="/profile/update" element={<ProtectedRoute><UpdateProfilePage /></ProtectedRoute>} />
-          <Route path="/profile/:username" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/profile/:username" element={<ProfilePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/invite" element={<ProtectedRoute><InvitePage /></ProtectedRoute>} />
           <Route path="/usertree" element={<UserTreePage />} />
           <Route path="/posts/create" element={<ProtectedRoute><CreatePostPage /></ProtectedRoute>} />
           <Route path="/posts/:postId/edit" element={<ProtectedRoute><CreatePostPage /></ProtectedRoute>} />
-          <Route path="/posts/:postId" element={<ProtectedRoute><PostDetailPage /></ProtectedRoute>} />
           <Route path="*" element={<Navigate to="/posts" replace />} />
         </Routes>
       </main>

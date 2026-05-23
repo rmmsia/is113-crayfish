@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useSearchParams, Link } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
+import { applyOptimisticVote } from '../utils/voteUtils'
+import LoginModal from '../components/LoginModal'
 
 const SORT_OPTIONS = [
   { label: 'TOP', value: 'top' },
@@ -16,6 +18,7 @@ export default function PostsPage() {
 
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
+  const [showLoginModal, setShowLoginModal] = useState(false)
   const sort = searchParams.get('sort') || 'new'
 
   useEffect(() => {
@@ -34,58 +37,22 @@ export default function PostsPage() {
       })
   }, [sort])
 
-  async function handleVote(postId, direction) {
-  if (!user) return; // Guard against logged-out users
+  const handleVote = async (postId, direction) => {
+    if (!user) { setShowLoginModal(true); return }
 
-  // 1. OPTIMISTIC UPDATE: Update UI immediately
-  setPosts(currentPosts => currentPosts.map(post => {
-    if (post._id !== postId) return post;
+    setPosts(current => current.map(p =>
+      p._id === postId ? applyOptimisticVote(p, direction, user._id) : p
+    ))
 
-    // Create copies of the vote arrays
-    let upvotes = [...(post.upvotes || [])].map(String);
-    let downvotes = [...(post.downvotes || [])].map(String);
-    const userId = String(user._id);
-
-    if (direction === 'upvote') {
-      if (upvotes.includes(userId)) {
-        // RETRACT: User is upvoting a post they already upvoted
-        upvotes = upvotes.filter(id => id !== userId);
-      } else {
-        // VOTE: Add to upvotes, remove from downvotes
-        upvotes.push(userId);
-        downvotes = downvotes.filter(id => id !== userId);
-      }
-    } else {
-      if (downvotes.includes(userId)) {
-        // RETRACT: User is downvoting a post they already downvoted
-        downvotes = downvotes.filter(id => id !== userId);
-      } else {
-        // VOTE: Add to downvotes, remove from upvotes
-        downvotes.push(userId);
-        upvotes = upvotes.filter(id => id !== userId);
-      }
+    try {
+      const res = await fetch(`/posts/${postId}/${direction}`, { method: 'POST', credentials: 'include' })
+      if (!res.ok) throw new Error()
+    } catch {
+      const syncRes = await fetch(`/posts?sort=${sort}`, { credentials: 'include' })
+      const data = await syncRes.json()
+      setPosts(data.posts)
     }
-
-    return { ...post, upvotes, downvotes };
-  }));
-
-  // 2. BACKEND CALL: Run in the background
-  try {
-    const res = await fetch(`/posts/${postId}/${direction}`, {
-      method: 'POST',
-      credentials: 'include'
-    });
-    
-    if (!res.ok) throw new Error('Vote failed');
-  } catch (err) {
-    // 3. ROLLBACK (Optional): If the server fails, you could re-fetch 
-    // the list here to sync the UI back to reality.
-    console.error("Voting failed, syncing state...");
-    const syncRes = await fetch(`/posts?sort=${sort}`, { credentials: 'include' });
-    const data = await syncRes.json();
-    setPosts(data.posts);
   }
-}
 
   if (loading) return <p>Loading...</p>
   if (error) return <p>{error}</p>
@@ -166,6 +133,7 @@ export default function PostsPage() {
           )
         })}
       </ol>
+      {showLoginModal && <LoginModal onClose={() => setShowLoginModal(false)} />}
     </main>
   )
 }
